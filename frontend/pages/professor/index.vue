@@ -11,15 +11,15 @@ try { professor = await getOnce('/professor') } catch {}
       <div class="absolute inset-0 opacity-[0.05]"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;" />
       <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-        <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Professor</p>
-        <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">森 聡 教授</h1>
+        <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Professor</p>
+        <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">森 聡 教授</h1>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
       <div class="grid md:grid-cols-3 gap-16">
         <!-- Photo -->
-        <div class="md:col-span-1">
+        <div class="fade-in md:col-span-1">
           <div class="aspect-[4/5] overflow-hidden bg-primary-50 relative">
             <img v-if="professor?.profile_image_url"
               :src="useStorageUrl(professor.profile_image_url) ?? ''"
@@ -46,7 +46,7 @@ try { professor = await getOnce('/professor') } catch {}
 
         <!-- Text -->
         <div class="md:col-span-2 space-y-12">
-          <div>
+          <div class="fade-in">
             <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">プロフィール</p>
             <div v-if="professor?.bio" class="text-gray-600 text-sm leading-[2]" v-html="professor.bio" />
             <div v-else class="text-gray-600 text-sm leading-[2] space-y-4">
@@ -56,7 +56,7 @@ try { professor = await getOnce('/professor') } catch {}
             </div>
           </div>
 
-          <div v-if="professor?.career?.length">
+          <div class="fade-in" v-if="professor?.career?.length">
             <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">経歴</p>
             <dl class="space-y-3">
               <div v-for="(item, i) in professor.career" :key="i" class="flex gap-4">
@@ -65,7 +65,7 @@ try { professor = await getOnce('/professor') } catch {}
               </div>
             </dl>
           </div>
-          <div v-else>
+          <div class="fade-in" v-else>
             <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">経歴</p>
             <dl class="space-y-3">
               <div v-for="item in [
@@ -81,7 +81,7 @@ try { professor = await getOnce('/professor') } catch {}
             </dl>
           </div>
 
-          <div v-if="professor?.awards?.length">
+          <div class="fade-in" v-if="professor?.awards?.length">
             <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">受賞歴</p>
             <dl class="space-y-3">
               <div v-for="(item, i) in professor.awards" :key="i" class="flex gap-4">

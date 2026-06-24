@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const { get } = useApi()
+const { observe } = useScrollAnimation()
 
 const activeType = ref((route.query.type as string) || 'all')
 const page = ref(Number(route.query.page) || 1)
@@ -27,7 +28,10 @@ const { data } = await useFetch<{ data: Post[]; last_page: number; total: number
 
 watch([activeType, page], () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
+  nextTick(observe)
 })
+
+watch(data, () => nextTick(observe))
 
 const typeLabel: Record<string, string> = {
   news: 'NEWS', blog: 'Blog', activity: '活動報告', admission: '入ゼミ',
@@ -47,8 +51,8 @@ const typeStyle: Record<string, string> = {
       <div class="absolute inset-0 opacity-[0.05]"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;" />
       <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-        <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Latest Updates</p>
-        <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">ニュース</h1>
+        <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Latest Updates</p>
+        <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">ニュース</h1>
       </div>
     </div>
 
@@ -73,7 +77,7 @@ const typeStyle: Record<string, string> = {
     <!-- List -->
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
       <ul class="divide-y divide-gray-100">
-        <li v-for="item in data?.data" :key="item.id">
+        <li v-for="item in data?.data" :key="item.id" class="fade-in">
           <NuxtLink :to="`/news/${item.slug}`" class="flex flex-col sm:flex-row sm:items-center gap-3 py-5 group">
             <time class="text-gray-400 text-sm font-mono w-28 shrink-0">
               {{ item.published_at?.slice(0, 10).replace(/-/g, '.') }}

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { get } = useApi()
+const { observe } = useScrollAnimation()
 const page = ref(1)
 
 const params = computed(() => ({ per_page: 12, page: page.value }))
@@ -8,7 +9,10 @@ const { data, refresh } = await get<{ data: any[]; last_page: number }>('/case-s
 watch(page, async () => {
   await refresh()
   window.scrollTo({ top: 0, behavior: 'smooth' })
+  nextTick(observe)
 })
+
+watch(data, () => nextTick(observe))
 </script>
 
 <template>
@@ -17,8 +21,8 @@ watch(page, async () => {
       <div class="absolute inset-0 opacity-[0.05]"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;" />
       <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-        <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Case Studies</p>
-        <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">ケーススタディ</h1>
+        <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Case Studies</p>
+        <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">ケーススタディ</h1>
       </div>
     </div>
 
@@ -27,7 +31,7 @@ watch(page, async () => {
         <NuxtLink
           v-for="cs in data.data" :key="cs.id"
           :to="`/case-studies/${cs.slug}`"
-          class="group block"
+          class="fade-in group block"
         >
           <div class="aspect-video bg-primary-50 overflow-hidden mb-4">
             <img v-if="cs.thumbnail_url"

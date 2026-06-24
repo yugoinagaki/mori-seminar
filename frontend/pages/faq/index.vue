@@ -14,15 +14,15 @@ const toggle = (id: number) => { openId.value = openId.value === id ? null : id 
       <div class="absolute inset-0 opacity-[0.05]"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;" />
       <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-        <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">FAQ</p>
-        <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">よくある質問</h1>
+        <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">FAQ</p>
+        <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">よくある質問</h1>
       </div>
     </div>
 
     <div class="max-w-3xl mx-auto px-6 md:px-14 py-16">
       <div v-if="faqs.length">
         <template v-for="cat in [...categories, null]" :key="cat">
-          <div v-if="faqs.filter(f => f.category === cat).length" class="mb-12">
+          <div v-if="faqs.filter(f => f.category === cat).length" class="fade-in mb-12">
             <h2 v-if="cat" class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">{{ cat }}</h2>
             <dl class="divide-y divide-gray-100">
               <div v-for="faq in faqs.filter(f => f.category === cat)" :key="faq.id">
@@ -47,9 +47,9 @@ const toggle = (id: number) => { openId.value = openId.value === id ? null : id 
           </div>
         </template>
       </div>
-      <p v-else class="py-16 text-center text-gray-400">FAQはまだ登録されていません</p>
+      <p v-else class="fade-in py-16 text-center text-gray-400">FAQはまだ登録されていません</p>
 
-      <div class="mt-12 pt-8 border-t border-gray-100 text-center">
+      <div class="fade-in mt-12 pt-8 border-t border-gray-100 text-center">
         <p class="text-gray-500 text-sm mb-6">解決しない場合はお気軽にお問い合わせください</p>
         <NuxtLink to="/contact" class="btn-primary">お問い合わせ</NuxtLink>
       </div>

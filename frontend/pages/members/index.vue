@@ -1,9 +1,12 @@
 <script setup lang="ts">
 const { get } = useApi()
+const { observe } = useScrollAnimation()
 const { data } = await get<Member[]>('/members')
 
 const activeTab = ref<'active' | 'ob_og'>('active')
 const filtered = computed(() => (data.value ?? []).filter(m => m.status === activeTab.value))
+
+watch(activeTab, () => nextTick(observe))
 </script>
 
 <template>
@@ -12,8 +15,8 @@ const filtered = computed(() => (data.value ?? []).filter(m => m.status === acti
       <div class="absolute inset-0 opacity-[0.05]"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;" />
       <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-        <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Members</p>
-        <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">ゼミ生紹介</h1>
+        <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Members</p>
+        <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">ゼミ生紹介</h1>
       </div>
     </div>
 
@@ -34,7 +37,7 @@ const filtered = computed(() => (data.value ?? []).filter(m => m.status === acti
 
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
       <div v-if="filtered.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        <div v-for="member in filtered" :key="member.id" class="group">
+        <div v-for="member in filtered" :key="member.id" class="fade-in group">
           <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
             <img v-if="member.profile_image_url"
               :src="useStorageUrl(member.profile_image_url) ?? ''"
