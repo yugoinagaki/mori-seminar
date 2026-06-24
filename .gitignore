@@ -1,0 +1,22 @@
+# Laravel
+backend/vendor/
+backend/.env
+backend/.env.backup
+backend/storage/logs/
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/
+backend/public/storage
+backend/database/database.sqlite
+
+# Nuxt
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/.env
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
