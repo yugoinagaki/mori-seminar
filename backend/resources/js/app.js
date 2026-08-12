@@ -38,14 +38,12 @@ function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    // Remove the pre-CSS dark navy background so the expanding mask hole
-    // reveals the page, not the fallback color.
+    // Clear pre-CSS dark navy fallback, then add animation class in the same
+    // JS tick so the browser commits both changes in one frame, guaranteeing
+    // the animation starts at t=0 with the forest fully covering the page.
     overlay.style.background = 'transparent';
-    // Start animation exactly at DOMContentLoaded so timing is consistent
-    // regardless of server response time differences between pages.
-    overlay.style.animationPlayState = 'running';
+    overlay.classList.add('is-animating');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
-    // Fallback in case animationend doesn't fire (e.g. reduced-motion)
     setTimeout(() => overlay.remove(), ANIM_MS + 200);
 }
 

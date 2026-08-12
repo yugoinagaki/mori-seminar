@@ -132,8 +132,11 @@
     z-index: 9999;
     pointer-events: none;
     overflow: hidden;
+}
+
+/* Added by JS at DOMContentLoaded so animation always starts at t=0 */
+.wipe-wrapper.is-animating {
     animation: r-expand 1.8s ease-in-out forwards;
-    animation-play-state: paused; /* JS starts it after DOMContentLoaded */
 }
 
 /* Used for nav-click overlay: forest shows immediately (no animation) */
