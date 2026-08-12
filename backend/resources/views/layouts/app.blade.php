@@ -11,13 +11,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>window.FOREST_IMG_URL = '{{ asset('forest.png') }}';</script>
 </head>
 <body>
 
 {{-- A. ページ遷移オーバーレイ（対象ページのみ出力） --}}
 @if ($showWipe ?? false)
 <div id="wipe-overlay" class="wipe-wrapper">
-    <div class="wipe-forest"></div>
+    <div class="wipe-forest" style="background-image:url('{{ asset('forest.png') }}')"></div>
 </div>
 @endif
 
