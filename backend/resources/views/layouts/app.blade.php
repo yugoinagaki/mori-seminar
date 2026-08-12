@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', '森聡研究会 | 慶應義塾大学')</title>
     <meta name="description" content="@yield('description', '慶應義塾大学 森聡研究会の公式サイト。国際政治学・現代アメリカ外交・先端技術を研究しています。')">
-    {{-- Critical inline CSS: applied before any external file loads, prevents white flash during navigation --}}
+    {{-- Preload forest image so decode is complete before #wipe-overlay renders --}}
+    @if ($showWipe ?? false)
+    <link rel="preload" as="image" href="{{ asset('forest.png') }}">
+    @endif
+    {{-- Critical inline CSS + forest image URL via asset() — applied before any external file loads --}}
     <style>
         html { background: #041c33 }
         @if ($showWipe ?? false)
         #wipe-overlay {
             position: fixed; inset: 0; z-index: 9999; overflow: hidden;
-            background-color: #041c33;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: url('{{ asset('forest.png') }}') center / cover no-repeat #041c33;
         }
         @endif
     </style>
@@ -30,7 +31,7 @@
 
 {{-- A. ページ遷移オーバーレイ（対象ページのみ出力） --}}
 @if ($showWipe ?? false)
-<div id="wipe-overlay" class="wipe-wrapper" style="background-image:url('{{ asset('forest.png') }}')">
+<div id="wipe-overlay" class="wipe-wrapper">
     <div class="wipe-tint"></div>
 </div>
 @endif
