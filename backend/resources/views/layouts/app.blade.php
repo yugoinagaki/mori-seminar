@@ -11,7 +11,7 @@
         @if ($showWipe ?? false)
         #wipe-overlay {
             position: fixed; inset: 0; z-index: 9999; overflow: hidden;
-            background: url('{{ asset('forest.png') }}') center / cover no-repeat, #041c33;
+            background-color: #041c33;
         }
         @endif
     </style>

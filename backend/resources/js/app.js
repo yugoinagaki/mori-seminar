@@ -38,6 +38,9 @@ function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
+    // Remove the pre-CSS dark navy background so the expanding mask hole
+    // reveals the page, not the fallback color.
+    overlay.style.background = 'transparent';
     // Start animation exactly at DOMContentLoaded so timing is consistent
     // regardless of server response time differences between pages.
     overlay.style.animationPlayState = 'running';
