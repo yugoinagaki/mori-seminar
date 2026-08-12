@@ -23,7 +23,7 @@ const ANIM_MS    = 1800;
 function createWipeOverlay() {
     const div = document.createElement('div');
     div.id        = 'wipe-overlay-nav';
-    div.className = 'wipe-wrapper';
+    div.className = 'wipe-wrapper-static';
     div.innerHTML = '<div class="wipe-forest"></div>';
     document.body.appendChild(div);
     return div;
@@ -39,12 +39,7 @@ function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    if (sessionStorage.getItem('wipe-nav') === '1') {
-        sessionStorage.removeItem('wipe-nav');
-        overlay.remove();
-    } else {
-        setTimeout(() => overlay.remove(), ANIM_MS);
-    }
+    setTimeout(() => overlay.remove(), ANIM_MS);
 }
 
 // リンククリック時に現ページ上でアニメーションを起動し 1.8s 後に遷移
@@ -71,12 +66,11 @@ function initWipeLinks() {
 
         createWipeOverlay();
 
-        // 遷移先ページの SSR overlay は即削除させる
-        sessionStorage.setItem('wipe-nav', '1');
-
-        setTimeout(() => {
+        // Wait two frames so the browser paints the static overlay before navigating.
+        // The destination page's SSR overlay then plays r-expand to reveal the page.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
             window.location.href = href;
-        }, ANIM_MS);
+        }));
     }, { capture: true });
 }
 
