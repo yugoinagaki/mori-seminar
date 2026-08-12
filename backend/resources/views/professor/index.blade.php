@@ -1,0 +1,116 @@
+@extends('layouts.app')
+
+@section('title', '森 聡 教授 | 森聡研究会')
+
+@section('content')
+<div>
+    <div class="pt-32 pb-16 relative" style="background: linear-gradient(155deg, #041c33 0%, #0d5189 100%)">
+        <div class="absolute inset-0 opacity-[0.05]"
+             style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;"></div>
+        <div class="relative max-w-7xl mx-auto px-6 md:px-14">
+            <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Professor</p>
+            <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">森 聡 教授</h1>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
+        <div class="grid md:grid-cols-3 gap-16">
+            {{-- 写真 --}}
+            <div class="fade-in md:col-span-1">
+                <div class="aspect-[4/5] overflow-hidden bg-primary-50 relative">
+                    @if($professor?->profile_image_url)
+                    <img src="{{ storage_url($professor->profile_image_url) }}"
+                         alt="森聡教授" class="w-full h-full object-cover" />
+                    @else
+                    <img src="https://picsum.photos/seed/professor/400/500"
+                         alt="森聡教授" class="w-full h-full object-cover" />
+                    @endif
+                </div>
+                <div class="mt-6 space-y-2">
+                    <h2 class="text-2xl font-bold text-gray-900">{{ $professor?->name ?? '森 聡' }}</h2>
+                    <p class="text-gray-500 text-sm">{{ $professor?->name_en ?? 'Satoshi Mori' }}</p>
+                    <p class="text-gray-500 text-sm">{{ $professor?->title ?? '慶應義塾大学 法学部 教授' }}</p>
+                </div>
+                @if($professor?->research_themes && count($professor->research_themes))
+                <div class="mt-6">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-3">研究テーマ</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($professor->research_themes as $tag)
+                        <span class="text-xs px-3 py-1.5 bg-primary-50 text-primary-700 font-medium">{{ $tag }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <div class="mt-6 flex flex-wrap gap-2">
+                    @foreach(['国際政治学', '現代アメリカ外交', '冷戦史', 'インド太平洋戦略', 'AI・安全保障'] as $tag)
+                    <span class="text-xs px-3 py-1.5 bg-primary-50 text-primary-700 font-medium">{{ $tag }}</span>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+
+            {{-- テキスト --}}
+            <div class="md:col-span-2 space-y-12">
+                <div class="fade-in">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">プロフィール</p>
+                    @if($professor?->bio)
+                    <div class="text-gray-600 text-sm leading-[2]">{!! $professor->bio !!}</div>
+                    @else
+                    <div class="text-gray-600 text-sm leading-[2] space-y-4">
+                        <p>専門は国際政治学、現代アメリカ外交、冷戦史。1972年大阪府生まれ。小学生時代にロンドン、高校時代に香港で過ごす。</p>
+                        <p>1995年京都大学法学部卒業。外務省勤務後、コロンビア大学ロースクール修了。2007年東京大学にて博士号取得。2008年法政大学法学部准教授、2010年より教授。現在、慶應義塾大学法学部教授。</p>
+                        <p>現在の研究領域は国際秩序の動態分析、アメリカのインド太平洋戦略、人工知能などの先端技術と安全保障の関係。</p>
+                    </div>
+                    @endif
+                </div>
+
+                @if($professor?->career && count($professor->career))
+                <div class="fade-in">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">経歴</p>
+                    <dl class="space-y-3">
+                        @foreach($professor->career as $item)
+                        <div class="flex gap-4">
+                            <dt class="text-gray-400 text-sm font-mono w-16 shrink-0">{{ $item['year'] ?? '' }}</dt>
+                            <dd class="text-gray-600 text-sm leading-relaxed">{{ $item['description'] ?? '' }}</dd>
+                        </div>
+                        @endforeach
+                    </dl>
+                </div>
+                @else
+                <div class="fade-in">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">経歴</p>
+                    <dl class="space-y-3">
+                        @foreach([
+                            ['1995', '京都大学法学部卒業'],
+                            ['2001', 'コロンビア大学ロースクール修了 (LL.M.)'],
+                            ['2007', '東京大学大学院 博士号取得'],
+                            ['2008', '法政大学法学部 准教授'],
+                            ['2010', '法政大学法学部 教授'],
+                        ] as [$year, $desc])
+                        <div class="flex gap-4">
+                            <dt class="text-gray-400 text-sm font-mono w-16 shrink-0">{{ $year }}</dt>
+                            <dd class="text-gray-600 text-sm">{{ $desc }}</dd>
+                        </div>
+                        @endforeach
+                    </dl>
+                </div>
+                @endif
+
+                @if($professor?->awards && count($professor->awards))
+                <div class="fade-in">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">受賞歴</p>
+                    <dl class="space-y-3">
+                        @foreach($professor->awards as $item)
+                        <div class="flex gap-4">
+                            <dt class="text-gray-400 text-sm font-mono w-16 shrink-0">{{ $item['year'] ?? '' }}</dt>
+                            <dd class="text-gray-600 text-sm">{{ $item['name'] ?? '' }}</dd>
+                        </div>
+                        @endforeach
+                    </dl>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
