@@ -346,6 +346,254 @@ function initNewsCard() {
     if (showBtn)  showBtn.addEventListener('click',  () => showCard());
 }
 
+// ─── H. Inline editing ────────────────────────────────────────────────────────
+function applyDraftValues() {
+    const drafts = window.__drafts || [];
+    drafts.forEach((d) => {
+        const el = document.querySelector(
+            `[data-editable][data-model="${d.model_type}"][data-id="${d.model_id}"][data-field="${d.field}"]`
+        );
+        if (el) el.textContent = d.value;
+    });
+}
+
+function saveDraft(modelType, modelId, field, value) {
+    return fetch('/drafts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': window.__csrfToken || '',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ model_type: modelType, model_id: modelId, field, value }),
+    });
+}
+
+let editTextarea = null;
+let editTarget   = null;
+
+function openTextarea(el) {
+    if (editTextarea) closeTextarea(true);
+
+    editTarget = el;
+    const rect = el.getBoundingClientRect();
+
+    const ta = document.createElement('textarea');
+    ta.value = el.textContent.trim();
+    ta.style.cssText = [
+        `position:fixed`,
+        `top:${rect.top}px`,
+        `left:${rect.left}px`,
+        `width:${Math.max(rect.width, 200)}px`,
+        `min-height:${Math.max(rect.height, 60)}px`,
+        `z-index:99998`,
+        `font:inherit`,
+        `font-size:${getComputedStyle(el).fontSize}`,
+        `color:${getComputedStyle(el).color}`,
+        `background:rgba(4,28,51,0.92)`,
+        `border:2px solid #f59e0b`,
+        `border-radius:4px`,
+        `padding:6px 10px`,
+        `resize:both`,
+        `outline:none`,
+        `box-shadow:0 4px 24px rgba(0,0,0,0.4)`,
+    ].join(';');
+
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    editTextarea = ta;
+
+    ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closeTextarea(false); }
+        if (e.key === 'Enter' && !e.shiftKey && !el.dataset.multiline) { e.preventDefault(); closeTextarea(true); }
+    });
+}
+
+function closeTextarea(save) {
+    if (!editTextarea || !editTarget) return;
+
+    const newValue = editTextarea.value;
+    const el       = editTarget;
+
+    editTextarea.remove();
+    editTextarea = null;
+    editTarget   = null;
+
+    if (!save) return;
+
+    el.textContent = newValue;
+
+    const { model, id, field } = el.dataset;
+    saveDraft(model, id || null, field, newValue).then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (data.draft_count !== undefined) {
+            updateDraftCount(data.draft_count);
+        }
+    });
+}
+
+function enableEditMode() {
+    document.querySelectorAll('[data-editable]').forEach((el) => {
+        el.classList.add('editable-active');
+        el.addEventListener('click', handleEditableClick);
+    });
+    applyDraftValues();
+}
+
+function disableEditMode() {
+    if (editTextarea) closeTextarea(false);
+    document.querySelectorAll('[data-editable]').forEach((el) => {
+        el.classList.remove('editable-active');
+        el.removeEventListener('click', handleEditableClick);
+    });
+}
+
+function handleEditableClick(e) {
+    e.stopPropagation();
+    openTextarea(e.currentTarget);
+}
+
+function updateEditBarUI(active) {
+    const dot      = document.getElementById('edit-bar-dot');
+    const label    = document.getElementById('edit-bar-label');
+    const status   = document.getElementById('edit-bar-status');
+    const toggle   = document.getElementById('edit-bar-toggle');
+    const actions  = document.getElementById('edit-bar-actions');
+    const newBtn   = document.getElementById('edit-bar-new');
+
+    if (!toggle) return;
+
+    if (active) {
+        dot?.classList.replace('bg-white/30', 'bg-amber-400');
+        status?.classList.replace('text-white/60', 'text-amber-300');
+        if (label) label.textContent = '編集モード';
+        toggle.textContent = '終了';
+        toggle.className = toggle.className.replace('bg-amber-500 text-white hover:bg-amber-400', 'bg-white/15 text-white hover:bg-white/25');
+        actions?.classList.remove('hidden');
+        newBtn?.classList.remove('hidden');
+    } else {
+        dot?.classList.replace('bg-amber-400', 'bg-white/30');
+        status?.classList.replace('text-amber-300', 'text-white/60');
+        if (label) label.textContent = 'プレビュー';
+        toggle.textContent = '編集開始';
+        toggle.className = toggle.className.replace('bg-white/15 text-white hover:bg-white/25', 'bg-amber-500 text-white hover:bg-amber-400');
+        actions?.classList.add('hidden');
+        newBtn?.classList.add('hidden');
+    }
+}
+
+function updateDraftCount(count) {
+    const countEl = document.getElementById('edit-bar-count');
+    const sepEl   = document.getElementById('edit-bar-sep');
+    const applyBtn = document.getElementById('edit-bar-apply');
+    const discardBtn = document.getElementById('edit-bar-discard');
+
+    if (countEl) {
+        countEl.textContent = `変更 ${count} 件`;
+        countEl.classList.toggle('hidden', count === 0);
+    }
+    if (sepEl) sepEl.classList.toggle('hidden', count === 0);
+    if (applyBtn) applyBtn.disabled = count === 0;
+    if (discardBtn) discardBtn.disabled = count === 0;
+}
+
+function initInlineEdit() {
+    if (window.__editMode) {
+        enableEditMode();
+    }
+
+    const toggle = document.getElementById('edit-bar-toggle');
+    if (toggle) {
+        toggle.addEventListener('click', async () => {
+            const res = await fetch('/edit-mode/toggle', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.__csrfToken || '',
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await res.json();
+            const active = data.edit_mode;
+            window.__editMode = active;
+            updateEditBarUI(active);
+            active ? enableEditMode() : disableEditMode();
+        });
+    }
+
+    // Close textarea when clicking outside
+    document.addEventListener('click', (e) => {
+        if (editTextarea && !editTextarea.contains(e.target) && !e.target.closest('[data-editable]')) {
+            closeTextarea(true);
+        }
+    });
+}
+
+// ─── I. New-content modal ─────────────────────────────────────────────────────
+function initCreateModal() {
+    const modal   = document.getElementById('create-modal');
+    const overlay = document.getElementById('create-modal-overlay');
+    const panel   = document.getElementById('create-modal-panel');
+    const closeBtn = document.getElementById('create-modal-close');
+    const newBtn  = document.getElementById('edit-bar-new');
+    const formArea = document.getElementById('create-form-area');
+
+    if (!modal) return;
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            overlay.classList.add('opacity-100');
+            panel.classList.remove('opacity-0', 'translate-y-4');
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        overlay.classList.remove('opacity-100');
+        panel.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            // Reset type selector
+            document.querySelectorAll('.create-type-btn').forEach((b) => b.classList.remove('border-primary-500', 'bg-primary-50'));
+            document.querySelectorAll('.create-form').forEach((f) => f.classList.add('hidden'));
+            formArea.classList.add('hidden');
+        }, 200);
+    }
+
+    if (newBtn) newBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+
+    // Type selector
+    document.querySelectorAll('.create-type-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+
+            // Update button styles
+            document.querySelectorAll('.create-type-btn').forEach((b) => {
+                b.classList.remove('border-primary-500', 'bg-primary-50', 'text-primary-700');
+                b.querySelector('svg')?.classList.remove('text-primary-700');
+            });
+            btn.classList.add('border-primary-500', 'bg-primary-50');
+
+            // Show matching form
+            document.querySelectorAll('.create-form').forEach((f) => f.classList.add('hidden'));
+            const form = document.getElementById(`form-${type}`);
+            if (form) {
+                form.classList.remove('hidden');
+                formArea.classList.remove('hidden');
+            }
+        });
+    });
+}
+
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initScrollObserver();
@@ -355,4 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initMembersTab();
     initFaq();
     initNewsCard();
+    initInlineEdit();
+    initCreateModal();
 });

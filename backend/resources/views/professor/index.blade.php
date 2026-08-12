@@ -27,9 +27,12 @@
                     @endif
                 </div>
                 <div class="mt-6 space-y-2">
-                    <h2 class="text-2xl font-bold text-gray-900">{{ $professor?->name ?? '森 聡' }}</h2>
-                    <p class="text-gray-500 text-sm">{{ $professor?->name_en ?? 'Satoshi Mori' }}</p>
-                    <p class="text-gray-500 text-sm">{{ $professor?->title ?? '慶應義塾大学 法学部 教授' }}</p>
+                    <h2 class="text-2xl font-bold text-gray-900"
+                    @if($professor) data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="name" @endif>{{ $professor?->name ?? '森 聡' }}</h2>
+                    <p class="text-gray-500 text-sm"
+                       @if($professor) data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="name_en" @endif>{{ $professor?->name_en ?? 'Satoshi Mori' }}</p>
+                    <p class="text-gray-500 text-sm"
+                       @if($professor) data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="title" @endif>{{ $professor?->title ?? '慶應義塾大学 法学部 教授' }}</p>
                 </div>
                 @if($professor?->research_themes && count($professor->research_themes))
                 <div class="mt-6">
@@ -54,7 +57,8 @@
                 <div class="fade-in">
                     <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">プロフィール</p>
                     @if($professor?->bio)
-                    <div class="text-gray-600 text-sm leading-[2]">{!! $professor->bio !!}</div>
+                    <div class="text-gray-600 text-sm leading-[2]"
+                         data-editable data-multiline data-model="professor" data-id="{{ $professor->id }}" data-field="bio">{!! $professor->bio !!}</div>
                     @else
                     <div class="text-gray-600 text-sm leading-[2] space-y-4">
                         <p>専門は国際政治学、現代アメリカ外交、冷戦史。1972年大阪府生まれ。小学生時代にロンドン、高校時代に香港で過ごす。</p>

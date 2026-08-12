@@ -13,7 +13,8 @@
             <div class="fade-in text-white/12 font-bold leading-none select-none" style="font-size: clamp(4rem, 12vw, 8rem)">
                 {{ $theme?->year ?? '2025' }}
             </div>
-            <h1 class="fade-in text-white text-3xl md:text-4xl font-bold tracking-tight -mt-2 leading-tight">
+            <h1 class="fade-in text-white text-3xl md:text-4xl font-bold tracking-tight -mt-2 leading-tight"
+                @if($theme) data-editable data-model="annual_theme" data-id="{{ $theme->id }}" data-field="title" @endif>
                 {{ $theme?->title ?? '変動する国際秩序と日本の外交戦略' }}
             </h1>
         </div>
@@ -23,6 +24,7 @@
         @if($theme?->content)
         <div
             class="fade-in prose prose-lg prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-700"
+            @if($theme) data-editable data-multiline data-model="annual_theme" data-id="{{ $theme->id }}" data-field="content" @endif
         >{!! $theme->content !!}</div>
         @else
         <div class="fade-in text-gray-600 text-sm leading-[2] space-y-6">

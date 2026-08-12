@@ -30,7 +30,8 @@
                             class="w-full flex items-start justify-between gap-4 py-5 text-left"
                             data-faq-button="{{ $faq->id }}"
                         >
-                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed">{{ $faq->question }}</span>
+                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed"
+                                  data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="question">{{ $faq->question }}</span>
                             <svg class="w-5 h-5 text-primary-700 shrink-0 mt-0.5 transition-transform duration-200"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                  data-faq-arrow>
@@ -38,7 +39,10 @@
                             </svg>
                         </button>
                     </dt>
-                    <dd class="pb-5 text-gray-500 text-sm leading-relaxed" data-faq-answer="{{ $faq->id }}" style="display:none">
+                    <dd class="pb-5 text-gray-500 text-sm leading-relaxed"
+                        data-faq-answer="{{ $faq->id }}"
+                        data-editable data-multiline data-model="faq" data-id="{{ $faq->id }}" data-field="answer"
+                        style="display:none">
                         {{ $faq->answer }}
                     </dd>
                 </div>
@@ -59,7 +63,8 @@
                             class="w-full flex items-start justify-between gap-4 py-5 text-left"
                             data-faq-button="{{ $faq->id }}"
                         >
-                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed">{{ $faq->question }}</span>
+                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed"
+                                  data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="question">{{ $faq->question }}</span>
                             <svg class="w-5 h-5 text-primary-700 shrink-0 mt-0.5 transition-transform duration-200"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                  data-faq-arrow>
@@ -67,7 +72,10 @@
                             </svg>
                         </button>
                     </dt>
-                    <dd class="pb-5 text-gray-500 text-sm leading-relaxed" data-faq-answer="{{ $faq->id }}" style="display:none">
+                    <dd class="pb-5 text-gray-500 text-sm leading-relaxed"
+                        data-faq-answer="{{ $faq->id }}"
+                        data-editable data-multiline data-model="faq" data-id="{{ $faq->id }}" data-field="answer"
+                        style="display:none">
                         {{ $faq->answer }}
                     </dd>
                 </div>

@@ -3,13 +3,27 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CaseStudyPageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DraftController;
+use App\Http\Controllers\EditModeController;
 use App\Http\Controllers\FaqPageController;
+use App\Http\Controllers\InlineCreateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfessorPageController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
+
+// ─── Inline edit (auth required) ────────────────────────────────────────────
+Route::middleware('auth')->group(function () {
+    Route::post('/edit-mode/toggle', [EditModeController::class, 'toggle'])->name('edit-mode.toggle');
+    Route::post('/drafts', [DraftController::class, 'store'])->name('drafts.store');
+    Route::post('/drafts/apply', [DraftController::class, 'apply'])->name('drafts.apply');
+    Route::post('/drafts/discard', [DraftController::class, 'discard'])->name('drafts.discard');
+    Route::post('/create/post', [InlineCreateController::class, 'post'])->name('create.post');
+    Route::post('/create/case-study', [InlineCreateController::class, 'caseStudy'])->name('create.case-study');
+    Route::post('/create/member', [InlineCreateController::class, 'member'])->name('create.member');
+});
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/theme', [ThemeController::class, 'index']);

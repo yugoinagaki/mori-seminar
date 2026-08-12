@@ -38,7 +38,8 @@ $typeLabel = [
                     {{ $post->published_at?->format('Y.m.d') }}
                 </time>
             </div>
-            <h1 class="fade-in text-white text-2xl md:text-4xl font-bold leading-tight">{{ $post->title }}</h1>
+            <h1 class="fade-in text-white text-2xl md:text-4xl font-bold leading-tight"
+                data-editable data-model="post" data-id="{{ $post->id }}" data-field="title">{{ $post->title }}</h1>
         </div>
     </div>
 
@@ -49,6 +50,7 @@ $typeLabel = [
                    prose-headings:font-bold prose-headings:text-gray-900
                    prose-a:text-primary-700 prose-a:no-underline hover:prose-a:underline
                    prose-img:rounded prose-img:w-full"
+            data-editable data-multiline data-model="post" data-id="{{ $post->id }}" data-field="content"
         >{!! $post->content !!}</div>
         @else
         <p class="fade-in text-gray-400">本文がありません。</p>

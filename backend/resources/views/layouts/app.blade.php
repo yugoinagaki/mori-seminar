@@ -115,9 +115,26 @@
     </div>
 </nav>
 
+{{-- Inline edit mode data for JS --}}
+@auth
+<script>
+window.__editMode = {{ session('edit_mode') ? 'true' : 'false' }};
+window.__csrfToken = '{{ csrf_token() }}';
+window.__drafts = {!! \App\Models\Draft::where('user_id', auth()->id())->get(['model_type','model_id','field','value'])->toJson() !!};
+</script>
+@else
+<script>window.__editMode = false; window.__drafts = [];</script>
+@endauth
+
 <main>
     @yield('content')
 </main>
+
+{{-- インライン編集バー（ログイン中のみ表示） --}}
+@include('partials.edit-bar')
+
+{{-- 新規作成モーダル --}}
+@include('partials.create-modal')
 
 {{-- フッター --}}
 <footer class="bg-primary-950 text-white">
