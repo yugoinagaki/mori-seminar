@@ -12,6 +12,9 @@
         #wipe-overlay {
             position: fixed; inset: 0; z-index: 9999; overflow: hidden;
             background-color: #041c33;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         @endif
     </style>
