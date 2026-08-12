@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" style="background:#041c33">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', '森聡研究会 | 慶應義塾大学')</title>
     <meta name="description" content="@yield('description', '慶應義塾大学 森聡研究会の公式サイト。国際政治学・現代アメリカ外交・先端技術を研究しています。')">
+    {{-- Critical inline CSS: applied before any external file loads, prevents white flash during navigation --}}
+    <style>
+        html { background: #041c33 }
+        @if ($showWipe ?? false)
+        #wipe-overlay {
+            position: fixed; inset: 0; z-index: 9999; overflow: hidden;
+            background: url('{{ asset('forest.png') }}') center / cover no-repeat, #041c33;
+        }
+        @endif
+    </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
