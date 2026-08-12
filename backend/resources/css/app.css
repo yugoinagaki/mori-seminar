@@ -132,6 +132,14 @@
     z-index: 9999;
     pointer-events: none;
     overflow: hidden;
+    /* forest image is set via inline style (asset URL); dark navy is the fallback */
+    background-color: #041c33;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* mask sits on the overlay itself — transparent holes reveal the page behind */
+    -webkit-mask-image: radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
+    mask-image:         radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
 }
 
 /* Added by JS at DOMContentLoaded so animation always starts at t=0 */
@@ -139,25 +147,21 @@
     animation: r-expand 1.8s ease-in-out forwards;
 }
 
-/* Used for nav-click overlay: forest shows immediately (no animation) */
+/* Used for nav-click overlay on source page: no mask, no animation */
 .wipe-wrapper-static {
     position: fixed;
     inset: 0;
     z-index: 9999;
     pointer-events: none;
     overflow: hidden;
+    background-color: #041c33;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.wipe-forest {
-    position: absolute;
-    inset: 0;
-    background: url('/forest.png') center / cover no-repeat;
-    -webkit-mask-image: radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
-    mask-image:         radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
-}
-
-.wipe-forest::after {
-    content: '';
+/* Dark blue tint layered over the forest image */
+.wipe-tint {
     position: absolute;
     inset: 0;
     background: rgba(4, 28, 51, 0.35);

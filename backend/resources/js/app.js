@@ -24,8 +24,8 @@ function createWipeOverlay() {
     const div = document.createElement('div');
     div.id        = 'wipe-overlay-nav';
     div.className = 'wipe-wrapper-static';
-    const forestUrl = window.FOREST_IMG_URL || '/forest.png';
-    div.innerHTML = `<div class="wipe-forest" style="background-image:url('${forestUrl}')"></div>`;
+    div.style.backgroundImage = `url('${window.FOREST_IMG_URL || '/forest.png'}')`;
+    div.innerHTML = '<div class="wipe-tint"></div>';
     document.body.appendChild(div);
     return div;
 }
@@ -38,10 +38,8 @@ function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    // Clear pre-CSS dark navy fallback, then add animation class in the same
-    // JS tick so the browser commits both changes in one frame, guaranteeing
-    // the animation starts at t=0 with the forest fully covering the page.
-    overlay.style.background = 'transparent';
+    // Add animation class — the mask on .wipe-wrapper itself grows transparent
+    // and reveals the page. No background clearing needed; the mask handles it.
     overlay.classList.add('is-animating');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
     setTimeout(() => overlay.remove(), ANIM_MS + 200);

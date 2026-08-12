@@ -27,8 +27,8 @@
 
 {{-- A. ページ遷移オーバーレイ（対象ページのみ出力） --}}
 @if ($showWipe ?? false)
-<div id="wipe-overlay" class="wipe-wrapper">
-    <div class="wipe-forest" style="background-image:url('{{ asset('forest.png') }}')"></div>
+<div id="wipe-overlay" class="wipe-wrapper" style="background-image:url('{{ asset('forest.png') }}')">
+    <div class="wipe-tint"></div>
 </div>
 @endif
 
