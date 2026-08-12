@@ -131,6 +131,7 @@
     pointer-events: none;
     overflow: hidden;
     animation: r-expand 1.8s ease-in-out forwards;
+    animation-play-state: paused; /* JS starts it after DOMContentLoaded */
 }
 
 /* Used for nav-click overlay: forest shows immediately (no animation) */

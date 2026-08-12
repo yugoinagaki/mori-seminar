@@ -35,12 +35,15 @@ function isWipePath(pathname) {
 }
 
 function initPageTransition() {
-    // 直接URLアクセス / リロード時: SSR が出力した overlay を 1.8s 後に削除
-    // ただし、リンク経由の遷移直後 (sessionStorage フラグあり) は即削除
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    setTimeout(() => overlay.remove(), ANIM_MS);
+    // Start animation exactly at DOMContentLoaded so timing is consistent
+    // regardless of server response time differences between pages.
+    overlay.style.animationPlayState = 'running';
+    overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+    // Fallback in case animationend doesn't fire (e.g. reduced-motion)
+    setTimeout(() => overlay.remove(), ANIM_MS + 200);
 }
 
 // リンククリック時に現ページ上でアニメーションを起動し 1.8s 後に遷移
@@ -67,11 +70,9 @@ function initWipeLinks() {
 
         createWipeOverlay();
 
-        // Wait two frames so the browser paints the static overlay before navigating.
-        // The destination page's SSR overlay then plays r-expand to reveal the page.
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            window.location.href = href;
-        }));
+        // 150ms: enough time for the browser to paint the static overlay
+        // before the HTTP navigation starts, minimising the blank-page gap.
+        setTimeout(() => { window.location.href = href; }, 150);
     }, { capture: true });
 }
 
