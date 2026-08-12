@@ -17,10 +17,67 @@ function initScrollObserver() {
 window.initScrollObserver = initScrollObserver;
 
 // ─── A. Page transition overlay ──────────────────────────────────────────────
+const WIPE_PATHS = ['/theme', '/news', '/professor', '/blog', '/members', '/case-studies', '/faq', '/contact'];
+const ANIM_MS    = 1800;
+
+function createWipeOverlay() {
+    const div = document.createElement('div');
+    div.id        = 'wipe-overlay-nav';
+    div.className = 'wipe-wrapper';
+    div.innerHTML = '<div class="wipe-forest"></div>';
+    document.body.appendChild(div);
+    return div;
+}
+
+function isWipePath(pathname) {
+    return WIPE_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?'));
+}
+
 function initPageTransition() {
+    // 直接URLアクセス / リロード時: SSR が出力した overlay を 1.8s 後に削除
+    // ただし、リンク経由の遷移直後 (sessionStorage フラグあり) は即削除
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
-    setTimeout(() => overlay.remove(), 1800);
+
+    if (sessionStorage.getItem('wipe-nav') === '1') {
+        sessionStorage.removeItem('wipe-nav');
+        overlay.remove();
+    } else {
+        setTimeout(() => overlay.remove(), ANIM_MS);
+    }
+}
+
+// リンククリック時に現ページ上でアニメーションを起動し 1.8s 後に遷移
+function initWipeLinks() {
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#') || href.startsWith('mailto:')) return;
+
+        const url      = new URL(href, window.location.href);
+        const pathname = url.pathname;
+
+        if (!isWipePath(pathname)) return;
+
+        // 同じページへのリンクは無視
+        if (pathname === window.location.pathname && url.search === window.location.search) return;
+
+        // すでにアニメーション中なら無視
+        if (document.getElementById('wipe-overlay-nav') || document.getElementById('wipe-overlay')) return;
+
+        e.preventDefault();
+
+        createWipeOverlay();
+
+        // 遷移先ページの SSR overlay は即削除させる
+        sessionStorage.setItem('wipe-nav', '1');
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, ANIM_MS);
+    }, { capture: true });
 }
 
 // ─── F. Navbar ────────────────────────────────────────────────────────────────
@@ -298,6 +355,7 @@ function initNewsCard() {
 document.addEventListener('DOMContentLoaded', () => {
     initScrollObserver();
     initPageTransition();
+    initWipeLinks();
     initNavbar();
     initMembersTab();
     initFaq();
