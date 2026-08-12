@@ -26,6 +26,8 @@
 @layer base {
     html {
         scroll-behavior: smooth;
+        /* Dark navy matches the wipe overlay so the HTTP-gap flash is invisible */
+        background-color: #041c33;
     }
     body {
         @apply text-gray-900 bg-white;

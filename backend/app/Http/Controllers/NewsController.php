@@ -34,7 +34,7 @@ class NewsController extends Controller
         $posts      = $query->paginate(20)->withQueryString();
         $typeOptions = self::TYPE_OPTIONS;
 
-        return view('news.index', compact('posts', 'activeType', 'typeOptions'));
+        return view('news.index', array_merge(compact('posts', 'activeType', 'typeOptions'), ['showWipe' => true]));
     }
 
     public function show(string $slug)
@@ -44,6 +44,6 @@ class NewsController extends Controller
             ->where('status', 'published')
             ->firstOrFail();
 
-        return view('news.show', compact('post'));
+        return view('news.show', ['post' => $post, 'showWipe' => true]);
     }
 }

@@ -15,7 +15,7 @@ class BlogController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('blog.index', compact('posts'));
+        return view('blog.index', ['posts' => $posts, 'showWipe' => true]);
     }
 
     public function show(string $slug)
@@ -26,6 +26,6 @@ class BlogController extends Controller
             ->where('type', 'blog')
             ->firstOrFail();
 
-        return view('blog.show', compact('post'));
+        return view('blog.show', ['post' => $post, 'showWipe' => true]);
     }
 }
