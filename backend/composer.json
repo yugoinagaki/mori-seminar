@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^3.8",
+        "mews/purifier": "^3.4",
         "spatie/laravel-medialibrary": "^11.23"
     },
     "require-dev": {

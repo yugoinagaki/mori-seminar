@@ -12,17 +12,35 @@ use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfessorPageController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
-// ─── Inline edit (auth required) ────────────────────────────────────────────
-Route::middleware('auth')->group(function () {
-    Route::post('/edit-mode/toggle', [EditModeController::class, 'toggle'])->name('edit-mode.toggle');
-    Route::post('/drafts', [DraftController::class, 'store'])->name('drafts.store');
-    Route::post('/drafts/apply', [DraftController::class, 'apply'])->name('drafts.apply');
-    Route::post('/drafts/discard', [DraftController::class, 'discard'])->name('drafts.discard');
-    Route::post('/create/post', [InlineCreateController::class, 'post'])->name('create.post');
-    Route::post('/create/case-study', [InlineCreateController::class, 'caseStudy'])->name('create.case-study');
-    Route::post('/create/member', [InlineCreateController::class, 'member'])->name('create.member');
+// ─── Inline edit (admin only) ─────────────────────────────────────────────────
+Route::middleware(['auth', EnsureUserIsAdmin::class])->group(function () {
+    // edit mode toggle: rate limit 30 req/min
+    Route::post('/edit-mode/toggle', [EditModeController::class, 'toggle'])
+        ->middleware('throttle:30,1')
+        ->name('edit-mode.toggle');
+
+    // draft save: rate limit 120 req/min (inline typing)
+    Route::post('/drafts', [DraftController::class, 'store'])
+        ->middleware('throttle:120,1')
+        ->name('drafts.store');
+
+    // apply / discard: rate limit 10 req/min
+    Route::post('/drafts/apply',   [DraftController::class, 'apply'])
+        ->middleware('throttle:10,1')
+        ->name('drafts.apply');
+    Route::post('/drafts/discard', [DraftController::class, 'discard'])
+        ->middleware('throttle:10,1')
+        ->name('drafts.discard');
+
+    // content creation: rate limit 20 req/min
+    Route::middleware('throttle:20,1')->group(function () {
+        Route::post('/create/post',        [InlineCreateController::class, 'post'])->name('create.post');
+        Route::post('/create/case-study',  [InlineCreateController::class, 'caseStudy'])->name('create.case-study');
+        Route::post('/create/member',      [InlineCreateController::class, 'member'])->name('create.member');
+    });
 });
 
 Route::get('/', [HomeController::class, 'index']);

@@ -155,7 +155,7 @@ $heroText = '森聡研究会';
         </div>
 
         {{-- E. 記事データ埋め込み --}}
-        <script id="news-articles-data" type="application/json">{!! json_encode($worldNews) !!}</script>
+        <script id="news-articles-data" type="application/json">{!! json_encode($worldNews, JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
         @endif
     </section>
 

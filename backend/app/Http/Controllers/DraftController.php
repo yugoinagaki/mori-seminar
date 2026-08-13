@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Post;
 use App\Models\Professor;
 use App\Models\SiteSetting;
+use App\Support\HtmlFields;
 use Illuminate\Http\Request;
 
 class DraftController extends Controller
@@ -33,6 +34,17 @@ class DraftController extends Controller
             'value'      => ['required', 'string'],
         ]);
 
+        // フィールドが編集許可リストにない場合は拒否（status, author_id 等の内部フィールド書き換えを防ぐ）
+        if (! HtmlFields::isAllowed($validated['model_type'], $validated['field'])) {
+            abort(422, 'This field is not editable.');
+        }
+
+        $safeValue = HtmlFields::sanitize(
+            $validated['model_type'],
+            $validated['field'],
+            $validated['value']
+        );
+
         Draft::updateOrCreate(
             [
                 'user_id'    => auth()->id(),
@@ -40,7 +52,7 @@ class DraftController extends Controller
                 'model_id'   => $validated['model_id'],
                 'field'      => $validated['field'],
             ],
-            ['value' => $validated['value']]
+            ['value' => $safeValue]
         );
 
         $count = Draft::where('user_id', auth()->id())->count();
@@ -61,6 +73,12 @@ class DraftController extends Controller
             $id    = $draft->model_id ?? 1;
             $model = $class::find($id);
             if (! $model) {
+                continue;
+            }
+
+            // 万一 DB に不正なフィールドが入っていても書き込まない
+            if (! HtmlFields::isAllowed($draft->model_type, $draft->field)) {
+                $draft->delete();
                 continue;
             }
 

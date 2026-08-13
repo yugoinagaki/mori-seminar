@@ -120,7 +120,7 @@
 <script>
 window.__editMode = {{ session('edit_mode') ? 'true' : 'false' }};
 window.__csrfToken = '{{ csrf_token() }}';
-window.__drafts = {!! \App\Models\Draft::where('user_id', auth()->id())->get(['model_type','model_id','field','value'])->toJson() !!};
+window.__drafts = {!! json_encode(\App\Models\Draft::where('user_id', auth()->id())->get(['model_type','model_id','field','value'])->toArray(), JSON_HEX_TAG | JSON_HEX_AMP) !!};
 </script>
 @else
 <script>window.__editMode = false; window.__drafts = [];</script>
