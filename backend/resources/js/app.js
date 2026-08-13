@@ -24,7 +24,10 @@ function createWipeOverlay() {
     const div = document.createElement('div');
     div.id        = 'wipe-overlay-nav';
     div.className = 'wipe-wrapper-static';
-    div.innerHTML = '<div class="wipe-forest-static"></div>';
+    const inner = document.createElement('div');
+    inner.className = 'wipe-forest-static';
+    if (window.FOREST_IMG_URL) inner.style.backgroundImage = `url('${window.FOREST_IMG_URL}')`;
+    div.appendChild(inner);
     document.body.appendChild(div);
     return div;
 }

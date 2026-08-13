@@ -11,12 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
 
-    @php
-        $setting = \App\Models\SiteSetting::instance();
-        $forestUrl = storage_url($setting->hero_image_url) ?? '';
-    @endphp
+    @php $forestUrl = asset('forest.png'); @endphp
 
-    <link rel="preload" as="image" href="/forest.png">
+    <link rel="preload" as="image" href="{{ $forestUrl }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -25,7 +22,7 @@
     {{-- Page transition wipe overlay --}}
     @if($showWipe ?? false)
         <div id="wipe-overlay" class="wipe-wrapper">
-            <div class="wipe-forest"></div>
+            <div class="wipe-forest" style="background-image: url('{{ $forestUrl }}')"></div>
         </div>
     @endif
 
