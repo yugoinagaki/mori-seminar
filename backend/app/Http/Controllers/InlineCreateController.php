@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CaseStudy;
 use App\Models\Member;
 use App\Models\Post;
+use App\Support\HtmlFields;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -22,16 +23,16 @@ class InlineCreateController extends Controller
 
         $post = Post::create([
             'type'         => $validated['type'],
-            'title'        => $validated['title'],
+            'title'        => strip_tags($validated['title']),
             'slug'         => Str::slug($validated['title']) . '-' . Str::random(4),
-            'content'      => $validated['content'] ?? '',
-            'excerpt'      => $validated['excerpt'] ?? null,
+            'content'      => HtmlFields::sanitize('post', 'content', $validated['content'] ?? ''),
+            'excerpt'      => $validated['excerpt'] ? strip_tags($validated['excerpt']) : null,
             'author_id'    => auth()->id(),
             'status'       => 'published',
             'published_at' => $validated['published_at'] ?? now(),
         ]);
 
-        $base = in_array($post->type, ['blog']) ? 'blog' : 'news';
+        $base = $post->type === 'blog' ? 'blog' : 'news';
 
         return redirect("/{$base}/{$post->slug}");
     }
@@ -46,10 +47,10 @@ class InlineCreateController extends Controller
         ]);
 
         $cs = CaseStudy::create([
-            'title'        => $validated['title'],
+            'title'        => strip_tags($validated['title']),
             'slug'         => Str::slug($validated['title']) . '-' . Str::random(4),
-            'description'  => $validated['description'] ?? null,
-            'content'      => $validated['content'] ?? '',
+            'description'  => $validated['description'] ? HtmlFields::sanitize('case_study', 'description', $validated['description']) : null,
+            'content'      => HtmlFields::sanitize('case_study', 'content', $validated['content'] ?? ''),
             'status'       => 'published',
             'published_at' => $validated['published_at'] ?? now(),
         ]);
@@ -69,7 +70,15 @@ class InlineCreateController extends Controller
             'status'          => ['required', 'in:active,alumni'],
         ]);
 
-        Member::create($validated);
+        Member::create([
+            'name'            => strip_tags($validated['name']),
+            'name_kana'       => isset($validated['name_kana']) ? strip_tags($validated['name_kana']) : null,
+            'generation'      => $validated['generation'] ?? null,
+            'university_year' => isset($validated['university_year']) ? strip_tags($validated['university_year']) : null,
+            'major'           => isset($validated['major']) ? strip_tags($validated['major']) : null,
+            'bio'             => isset($validated['bio']) ? HtmlFields::sanitize('member', 'bio', $validated['bio']) : null,
+            'status'          => $validated['status'],
+        ]);
 
         return redirect('/members');
     }

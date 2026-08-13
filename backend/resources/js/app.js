@@ -24,8 +24,7 @@ function createWipeOverlay() {
     const div = document.createElement('div');
     div.id        = 'wipe-overlay-nav';
     div.className = 'wipe-wrapper-static';
-    div.style.backgroundImage = `url('${window.FOREST_IMG_URL || '/forest.png'}')`;
-    div.innerHTML = '<div class="wipe-tint"></div>';
+    div.innerHTML = '<div class="wipe-forest-static"></div>';
     document.body.appendChild(div);
     return div;
 }
@@ -484,9 +483,9 @@ function updateEditBarUI(active) {
 }
 
 function updateDraftCount(count) {
-    const countEl = document.getElementById('edit-bar-count');
-    const sepEl   = document.getElementById('edit-bar-sep');
-    const applyBtn = document.getElementById('edit-bar-apply');
+    const countEl    = document.getElementById('edit-bar-count');
+    const sepEl      = document.getElementById('edit-bar-sep');
+    const applyBtn   = document.getElementById('edit-bar-apply');
     const discardBtn = document.getElementById('edit-bar-discard');
 
     if (countEl) {
@@ -531,11 +530,11 @@ function initInlineEdit() {
 
 // ─── I. New-content modal ─────────────────────────────────────────────────────
 function initCreateModal() {
-    const modal   = document.getElementById('create-modal');
-    const overlay = document.getElementById('create-modal-overlay');
-    const panel   = document.getElementById('create-modal-panel');
+    const modal    = document.getElementById('create-modal');
+    const overlay  = document.getElementById('create-modal-overlay');
+    const panel    = document.getElementById('create-modal-panel');
     const closeBtn = document.getElementById('create-modal-close');
-    const newBtn  = document.getElementById('edit-bar-new');
+    const newBtn   = document.getElementById('edit-bar-new');
     const formArea = document.getElementById('create-form-area');
 
     if (!modal) return;

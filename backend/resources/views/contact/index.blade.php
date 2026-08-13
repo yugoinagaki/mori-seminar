@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'お問い合わせ | 森聡研究会')
+@section('title', 'お問い合わせ')
 
 @section('content')
 <div>
@@ -49,7 +49,7 @@
                 <p class="text-gray-500 text-sm leading-relaxed mb-4">
                     入ゼミに関するよくある質問はFAQページをご確認ください。
                 </p>
-                <a href="/faq" class="inline-flex items-center gap-2 text-primary-700 text-sm font-medium hover:gap-3 transition-all">
+                <a href="/faq" class="inline-flex items-center gap-2 text-primary-700 text-sm font-medium hover:gap-3 transition-all" data-wipe-link>
                     FAQを見る
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>

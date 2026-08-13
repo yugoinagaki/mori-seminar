@@ -9,6 +9,7 @@ class ThemeController extends Controller
     public function index()
     {
         $theme = AnnualTheme::orderBy('year', 'desc')->first();
-        return view('theme.index', array_merge(compact('theme'), ['showWipe' => true]));
+
+        return view('theme.index', ['theme' => $theme, 'showWipe' => true]);
     }
 }

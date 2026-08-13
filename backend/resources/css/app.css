@@ -132,18 +132,26 @@
     z-index: 9999;
     pointer-events: none;
     overflow: hidden;
-    /* forest image is set via inline style (asset URL); dark navy is the fallback */
-    background-color: #041c33;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* mask sits on the overlay itself — transparent holes reveal the page behind */
+}
+
+/* Forest image layer with expanding mask */
+.wipe-forest {
+    position: absolute;
+    inset: 0;
+    background: url('/forest.png') center / cover no-repeat;
     -webkit-mask-image: radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
     mask-image:         radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
 }
 
-/* Added by JS at DOMContentLoaded so animation always starts at t=0 */
-.wipe-wrapper.is-animating {
+.wipe-forest::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 28, 51, 0.35);
+}
+
+/* JS adds .is-animating to #wipe-overlay — animate --r on .wipe-forest directly */
+.wipe-wrapper.is-animating .wipe-forest {
     animation: r-expand 1.8s ease-in-out forwards;
 }
 
@@ -154,14 +162,16 @@
     z-index: 9999;
     pointer-events: none;
     overflow: hidden;
-    background-color: #041c33;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
-/* Dark blue tint layered over the forest image */
-.wipe-tint {
+.wipe-forest-static {
+    position: absolute;
+    inset: 0;
+    background: url('/forest.png') center / cover no-repeat;
+}
+
+.wipe-forest-static::after {
+    content: '';
     position: absolute;
     inset: 0;
     background: rgba(4, 28, 51, 0.35);

@@ -1,58 +1,48 @@
 @extends('layouts.app')
 
-@section('title', 'ニュース | 森聡研究会')
+@section('title', 'ニュース')
 
 @section('content')
-@php
-$typeStyle = [
-    'news'      => 'bg-primary-700 text-white',
-    'blog'      => 'bg-emerald-700 text-white',
-    'activity'  => 'bg-amber-600 text-white',
-    'admission' => 'bg-rose-700 text-white',
-];
-$typeLabel = [
-    'news'      => 'NEWS',
-    'blog'      => 'Blog',
-    'activity'  => '活動報告',
-    'admission' => '入ゼミ',
-];
-@endphp
 <div>
+    {{-- Page Hero --}}
     <div class="pt-32 pb-16 relative" style="background: linear-gradient(155deg, #041c33 0%, #0d5189 100%)">
         <div class="absolute inset-0 opacity-[0.05]"
              style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 36px 36px;"></div>
         <div class="relative max-w-7xl mx-auto px-6 md:px-14">
-            <p class="fade-in text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Latest Updates</p>
-            <h1 class="fade-in text-white text-4xl md:text-5xl font-bold tracking-tight">ニュース</h1>
+            <p class="text-white/35 text-[10px] tracking-[0.4em] uppercase mb-4">Latest Updates</p>
+            <h1 class="text-white text-4xl md:text-5xl font-bold tracking-tight">ニュース</h1>
         </div>
     </div>
 
-    {{-- フィルタータブ --}}
+    {{-- Filter tabs --}}
     <div class="bg-white border-b border-gray-100 sticky top-[60px] z-40">
         <div class="max-w-7xl mx-auto px-6 md:px-14">
             <div class="flex gap-0 overflow-x-auto">
-                @foreach($typeOptions as $val => $label)
-                <a
-                    href="{{ url('/news') . ($val !== 'all' ? '?type=' . $val : '') }}"
-                    class="px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors
-                           {{ $activeType === $val ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-400 hover:text-gray-700' }}"
-                >{{ $label }}</a>
+                @foreach($typeOptions as $key => $label)
+                <a href="{{ $key === 'all' ? '/news' : '/news?type=' . $key }}"
+                   class="px-5 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors
+                          {{ $activeType === $key ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-400 hover:text-gray-700' }}">
+                    {{ $label }}
+                </a>
                 @endforeach
             </div>
         </div>
     </div>
 
-    {{-- リスト --}}
+    {{-- List --}}
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
+        @php
+            $typeLabel = ['news'=>'NEWS','blog'=>'Blog','activity'=>'活動報告','admission'=>'入ゼミ'];
+            $typeStyle = ['news'=>'bg-primary-700 text-white','blog'=>'bg-emerald-700 text-white','activity'=>'bg-amber-600 text-white','admission'=>'bg-rose-700 text-white'];
+        @endphp
         <ul class="divide-y divide-gray-100">
             @forelse($posts as $item)
-            <li class="fade-in">
-                <a href="/news/{{ $item->slug }}" class="flex flex-col sm:flex-row sm:items-center gap-3 py-5 group">
+            <li>
+                <a href="/news/{{ $item->slug }}" class="flex flex-col sm:flex-row sm:items-center gap-3 py-5 group" data-wipe-link>
                     <time class="text-gray-400 text-sm font-mono w-28 shrink-0">
                         {{ $item->published_at?->format('Y.m.d') }}
                     </time>
-                    <span class="text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0
-                                 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }}">
+                    <span class="text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }}">
                         {{ $typeLabel[$item->type] ?? $item->type }}
                     </span>
                     <span class="flex-1 text-gray-700 text-sm md:text-[15px] font-medium group-hover:text-primary-700 transition-colors">
@@ -69,7 +59,11 @@ $typeLabel = [
             @endforelse
         </ul>
 
-        {{ $posts->links('vendor.pagination.custom') }}
+        @if($posts->hasPages())
+        <div class="flex justify-center gap-2 mt-12">
+            {{ $posts->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection
