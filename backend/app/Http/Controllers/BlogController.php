@@ -26,6 +26,6 @@ class BlogController extends Controller
             ->where('type', 'blog')
             ->firstOrFail();
 
-        return view('blog.show', ['post' => $post, 'showWipe' => true]);
+        return view('blog.show', ['post' => $post]);
     }
 }

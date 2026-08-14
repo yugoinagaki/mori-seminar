@@ -44,6 +44,6 @@ class NewsController extends Controller
             ->where('status', 'published')
             ->firstOrFail();
 
-        return view('news.show', ['post' => $post, 'showWipe' => true]);
+        return view('news.show', ['post' => $post]);
     }
 }

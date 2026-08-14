@@ -28,27 +28,14 @@
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-28">
         <div class="text-center md:text-left">
-            <p class="hero-sub text-white/70 text-[10px] tracking-[0.45em] uppercase font-light mb-10"
-               style="animation-delay: 0.05s">Keio University</p>
-
-            <h1 class="text-white font-bold mb-4 leading-none font-mincho"
-                style="font-size: clamp(2.8rem, 8vw, 6rem); letter-spacing: 0.12em">
-                @foreach(['森','聡','研','究','会'] as $i => $char)
-                <span class="hero-char" style="animation-delay: {{ 0.2 + $i * 0.2 }}s">{{ $char }}</span>
-                @endforeach
+            <h1 class="text-white font-bold mb-6 leading-none"
+                id="hero-title"
+                style="font-size: clamp(2.8rem, 8vw, 6rem); letter-spacing: 0.1em; opacity: 0">
             </h1>
 
-            <p class="hero-sub text-white/75 text-sm md:text-base font-light tracking-[0.25em] uppercase mb-10"
-               style="animation-delay: 1.6s">mori satoru seminar</p>
-
-            <div class="hero-sub flex items-center justify-center md:justify-start gap-5 mb-10"
-                 style="animation-delay: 1.9s">
-                <div class="w-10 h-px bg-white/60"></div>
-                <p class="text-white text-xs tracking-widest font-medium"
-                   style="text-shadow: 0 1px 8px rgba(0,0,0,0.8)">現代国際政治</p>
-            </div>
-
-            <div class="hero-sub flex flex-wrap justify-center md:justify-start gap-4" style="animation-delay: 2.1s">
+            <div id="hero-buttons"
+                 class="flex flex-wrap justify-center md:justify-start gap-4"
+                 style="opacity: 0; transform: translateY(10px)">
                 <a href="/theme" class="btn-outline-white" data-wipe-link>
                     研究テーマについて
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +56,7 @@
     @if(count($worldNews) > 0)
     <div class="hidden lg:block fixed top-28 right-4 w-64 z-40 hero-sub" style="animation-delay: 2.6s"
          id="news-widget">
-        <div class="flex justify-end mb-1">
+        <div id="news-widget-header" class="flex justify-end mb-1">
             <button id="news-widget-close"
                     class="flex items-center justify-center w-5 h-5 rounded-full bg-primary-900/80 hover:bg-primary-700 text-white/80 hover:text-white transition-all border border-white/20"
                     aria-label="閉じる">
@@ -78,9 +65,10 @@
                 </svg>
             </button>
         </div>
-        <div id="news-card-container"
-             class="border border-white/15 backdrop-blur-sm overflow-hidden"
-             style="background: rgba(4, 18, 35, 0.78)">
+        <a id="news-card-container"
+           href="{{ $worldNews[0]['link'] ?? '#' }}" target="_blank" rel="noopener"
+           class="block border border-white/15 backdrop-blur-sm overflow-hidden hover:border-white/30 transition-colors"
+           style="background: rgba(4, 18, 35, 0.78)">
             <div class="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
                 <div class="flex items-center gap-2">
                     <span class="relative flex h-1.5 w-1.5">
@@ -110,7 +98,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
             </div>
-        </div>
+        </a>
         <button id="news-widget-show"
                 class="hidden ml-auto mt-1 items-center gap-1.5 px-3 py-1.5 text-white/70 hover:text-white text-xs border border-white/20 backdrop-blur-sm transition-colors"
                 style="background: rgba(4, 18, 35, 0.7)">

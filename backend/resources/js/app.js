@@ -46,22 +46,30 @@ function createWipeOverlay() {
 }
 
 function isWipePath(pathname) {
-    return WIPE_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?'));
+    // Exact match only — sub-paths like /news/123 do not get the animation
+    const normalized = pathname.replace(/\/$/, '');
+    return WIPE_PATHS.includes(normalized);
 }
 
 function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    // Sync background-image with the image chosen by the departing page
+    // Only animate if a departure animation was triggered on the previous page.
+    // Tab switches and direct URL visits have no pending image → skip animation.
+    let pending = null;
     try {
-        const pending = sessionStorage.getItem('wipe-pending-image');
-        if (pending) {
-            const forest = overlay.querySelector('.wipe-forest');
-            if (forest) forest.style.backgroundImage = `url('${pending}')`;
-            sessionStorage.removeItem('wipe-pending-image');
-        }
+        pending = sessionStorage.getItem('wipe-pending-image');
+        sessionStorage.removeItem('wipe-pending-image');
     } catch {}
+
+    if (!pending) {
+        overlay.remove();
+        return;
+    }
+
+    const forest = overlay.querySelector('.wipe-forest');
+    if (forest) forest.style.backgroundImage = `url('${pending}')`;
 
     overlay.classList.add('is-animating');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
@@ -82,8 +90,8 @@ function initWipeLinks() {
 
         if (!isWipePath(pathname)) return;
 
-        // 同じページへのリンクは無視
-        if (pathname === window.location.pathname && url.search === window.location.search) return;
+        // 同一パスへのリンクはタブ切り替え等も含めて無視（クエリが違っても）
+        if (pathname === window.location.pathname) return;
 
         // すでにアニメーション中なら無視
         if (document.getElementById('wipe-overlay-nav') || document.getElementById('wipe-overlay')) return;
@@ -218,31 +226,26 @@ function initFaq() {
 
 // ─── E. World news card rotation ─────────────────────────────────────────────
 function initNewsCard() {
-    const dataEl = document.getElementById('news-articles-data');
-    if (!dataEl) return;
+    const articles = window.__worldNews;
+    if (!Array.isArray(articles) || !articles.length) return;
 
-    let articles;
-    try { articles = JSON.parse(dataEl.textContent || '[]'); } catch { return; }
-    if (!articles.length) return;
+    const header      = document.getElementById('news-widget-header');
+    const cardLink    = document.getElementById('news-card-container');
+    const closeBtn    = document.getElementById('news-widget-close');
+    const showBtn     = document.getElementById('news-widget-show');
+    const titleEl     = document.getElementById('news-title');
+    const timeEl      = document.getElementById('news-time');
+    const counterEl   = document.getElementById('news-counter');
+    const progressBar = document.getElementById('news-progress');
+    const dotsContainer = document.getElementById('news-dots');
 
-    const cardWrapper     = document.getElementById('news-card-wrapper');
-    const cardContainer   = document.getElementById('news-card-container');
-    const showBtn         = document.getElementById('news-card-show-btn');
-    const closeBtn        = document.getElementById('news-card-close-btn');
-    const titleEl         = document.getElementById('news-card-title');
-    const timeEl          = document.getElementById('news-card-time');
-    const counterEl       = document.getElementById('news-card-counter');
-    const progressBar     = document.getElementById('news-card-progress');
-    const dotsContainer   = document.getElementById('news-card-dots');
-
-    if (!cardWrapper) return;
+    if (!cardLink) return;
 
     const INTERVAL = 7000;
     let currentIndex = 0;
     let progress = 0;
     let rotateTimer = null;
     let progressTimer = null;
-    let cardVisible = true;
 
     function timeAgo(dateStr) {
         if (!dateStr) return '';
@@ -254,56 +257,22 @@ function initNewsCard() {
         return 'たった今';
     }
 
-    function buildDots() {
-        if (!dotsContainer) return;
-        dotsContainer.innerHTML = '';
-        articles.forEach((_, i) => {
-            const dot = document.createElement('span');
-            dot.className = 'block rounded-full transition-all duration-300';
-            dot.dataset.dotIndex = i;
-            dotsContainer.appendChild(dot);
-        });
-    }
-
     function updateDots() {
         if (!dotsContainer) return;
-        dotsContainer.querySelectorAll('[data-dot-index]').forEach((dot) => {
-            const i = parseInt(dot.dataset.dotIndex, 10);
-            if (i === currentIndex) {
-                dot.className = 'block rounded-full transition-all duration-300 w-3 h-1 bg-white/60';
-            } else {
-                dot.className = 'block rounded-full transition-all duration-300 w-1 h-1 bg-white/20';
-            }
+        dotsContainer.querySelectorAll('span').forEach((dot, i) => {
+            dot.className = i === currentIndex
+                ? 'block rounded-full transition-all duration-300 w-3 h-1 bg-white/60'
+                : 'block rounded-full transition-all duration-300 w-1 h-1 bg-white/20';
         });
     }
 
-    function renderCard(animate) {
+    function applyArticle() {
         const article = articles[currentIndex];
-        if (!article) return;
-
-        if (animate && cardContainer) {
-            cardContainer.classList.add('news-card-leave-active', 'news-card-leave-to');
-            setTimeout(() => {
-                cardContainer.classList.remove('news-card-leave-active', 'news-card-leave-to');
-                applyCardData(article);
-                cardContainer.classList.add('news-card-enter-from');
-                cardContainer.getBoundingClientRect();
-                cardContainer.classList.add('news-card-enter-active');
-                cardContainer.classList.remove('news-card-enter-from');
-                setTimeout(() => cardContainer.classList.remove('news-card-enter-active'), 500);
-            }, 300);
-        } else {
-            applyCardData(article);
-        }
-
+        if (titleEl)   titleEl.textContent     = article.title;
+        if (timeEl)    timeEl.textContent      = timeAgo(article.pubDate);
+        if (counterEl) counterEl.textContent   = `${currentIndex + 1} / ${articles.length}`;
+        if (cardLink)  cardLink.href           = article.link;
         updateDots();
-    }
-
-    function applyCardData(article) {
-        if (titleEl)   titleEl.textContent = article.title;
-        if (timeEl)    timeEl.textContent  = timeAgo(article.pubDate);
-        if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${articles.length}`;
-        if (cardContainer) cardContainer.href = article.link;
     }
 
     function startRotation() {
@@ -311,9 +280,8 @@ function initNewsCard() {
             currentIndex = (currentIndex + 1) % articles.length;
             progress = 0;
             if (progressBar) progressBar.style.width = '0%';
-            renderCard(true);
+            applyArticle();
         }, INTERVAL);
-
         progressTimer = setInterval(() => {
             progress = Math.min(progress + (100 / (INTERVAL / 100)), 100);
             if (progressBar) progressBar.style.width = `${progress}%`;
@@ -321,52 +289,29 @@ function initNewsCard() {
     }
 
     function stopRotation() {
-        if (rotateTimer)   clearInterval(rotateTimer);
-        if (progressTimer) clearInterval(progressTimer);
+        clearInterval(rotateTimer);
+        clearInterval(progressTimer);
     }
 
-    function showCard() {
-        cardVisible = true;
-        if (showBtn)       showBtn.style.display = 'none';
-        if (closeBtn)      closeBtn.style.display = '';
-        if (cardContainer) {
-            cardContainer.style.display = '';
-            cardContainer.classList.add('news-card-enter-from');
-            cardContainer.getBoundingClientRect();
-            cardContainer.classList.add('news-card-enter-active');
-            cardContainer.classList.remove('news-card-enter-from');
-            setTimeout(() => cardContainer.classList.remove('news-card-enter-active'), 500);
-        }
+    function hideWidget() {
+        stopRotation();
+        if (header)   header.style.display   = 'none';
+        if (cardLink) cardLink.style.display  = 'none';
+        if (showBtn)  { showBtn.classList.remove('hidden'); showBtn.style.display = 'flex'; }
+    }
+
+    function showWidget() {
+        if (header)   header.style.display   = '';
+        if (cardLink) cardLink.style.display  = '';
+        if (showBtn)  { showBtn.classList.add('hidden'); showBtn.style.display = 'none'; }
         startRotation();
     }
 
-    function hideCard() {
-        cardVisible = false;
-        stopRotation();
-        if (cardContainer) {
-            cardContainer.classList.add('news-card-leave-active', 'news-card-leave-to');
-            setTimeout(() => {
-                cardContainer.style.display = 'none';
-                cardContainer.classList.remove('news-card-leave-active', 'news-card-leave-to');
-                if (showBtn) {
-                    showBtn.style.display = '';
-                    showBtn.classList.add('news-card-enter-from');
-                    showBtn.getBoundingClientRect();
-                    showBtn.classList.add('news-card-enter-active');
-                    showBtn.classList.remove('news-card-enter-from');
-                    setTimeout(() => showBtn.classList.remove('news-card-enter-active'), 500);
-                }
-                if (closeBtn) closeBtn.style.display = 'none';
-            }, 300);
-        }
-    }
-
-    buildDots();
-    renderCard(false);
+    applyArticle();
     startRotation();
 
-    if (closeBtn) closeBtn.addEventListener('click', () => hideCard());
-    if (showBtn)  showBtn.addEventListener('click',  () => showCard());
+    if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); hideWidget(); });
+    if (showBtn)  showBtn.addEventListener('click', () => showWidget());
 }
 
 // ─── H. Inline editing ────────────────────────────────────────────────────────
@@ -629,7 +574,76 @@ function initCreateModal() {
     });
 }
 
+// ─── J. Hero title morph (EN words sequential → slide-out → JA char-by-char) ─
+function initMorphTitle() {
+    const h1   = document.getElementById('hero-title');
+    const btns = document.getElementById('hero-buttons');
+    if (!h1) return;
+
+    const mobile = window.matchMedia('(max-width: 767px)').matches;
+
+    // Step 1: Place all words in DOM immediately (invisible) so layout is fixed,
+    // then fade each in one by one at its final resting position
+    const wordSpans = ['MORI', 'SATORU', 'SEMINAR'].map((word, i) => {
+        if (i > 0) h1.appendChild(document.createTextNode(' '));
+        const span = document.createElement('span');
+        span.style.cssText = 'opacity:0; display:inline-block; transition:opacity 0.5s ease';
+        span.textContent = word;
+        h1.appendChild(span);
+        return span;
+    });
+    h1.style.opacity = '1';
+
+    wordSpans.forEach((span, i) => {
+        setTimeout(() => { span.style.opacity = '1'; }, 200 + i * 480);
+    });
+
+    // Step 2: Slide h1 out (left on desktop, up on mobile)
+    setTimeout(() => {
+        h1.style.transition = 'opacity 0.45s ease, transform 0.55s cubic-bezier(0.4, 0, 1, 1)';
+        h1.style.opacity    = '0';
+        h1.style.transform  = mobile ? 'translateY(-100vh)' : 'translateX(-100vw)';
+
+        // Step 3: Replace with Japanese chars, one by one (hero-char style)
+        setTimeout(() => {
+            h1.style.transition    = 'none';
+            h1.style.transform     = 'none';
+            h1.style.opacity       = '1';
+            h1.innerHTML           = '';
+            h1.classList.add('font-mincho');
+            h1.style.letterSpacing = '0.12em';
+
+            ['森', '聡', '研', '究', '会'].forEach((char, i) => {
+                const span = document.createElement('span');
+                span.className = 'hero-char';
+                span.style.animationDelay = `${i * 0.2}s`;
+                span.textContent = char;
+                h1.appendChild(span);
+            });
+
+            // Step 4: Buttons after chars are mostly visible
+            setTimeout(() => {
+                if (!btns) return;
+                btns.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                btns.style.transform  = 'translateY(0)';
+                btns.style.opacity    = '1';
+            }, 1600);
+        }, 500);
+    }, 2500);
+}
+
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
+
+// When browser restores a page from bfcache (back/forward swipe), remove any
+// leftover wipe overlays so the user sees the actual page content.
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+        document.getElementById('wipe-overlay-nav')?.remove();
+        document.getElementById('wipe-overlay')?.remove();
+        try { sessionStorage.removeItem('wipe-pending-image'); } catch {}
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     initScrollObserver();
     initPageTransition();
@@ -640,4 +654,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initNewsCard();
     initInlineEdit();
     initCreateModal();
+    initMorphTitle();
 });

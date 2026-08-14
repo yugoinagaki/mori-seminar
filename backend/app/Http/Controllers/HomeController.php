@@ -23,26 +23,34 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        $worldNews = Cache::remember('world_news', 1800, function () {
+        $cached = Cache::get('world_news');
+        $worldNews = $cached ?: [];
+
+        if (empty($cached)) {
             try {
-                $rss = Http::timeout(5)->get('https://www3.nhk.or.jp/rss/news/cat6.xml');
-                if (! $rss->successful()) return [];
-                $xml = simplexml_load_string($rss->body());
-                if (! $xml) return [];
-                $items = [];
-                foreach ($xml->channel->item as $item) {
-                    $items[] = [
-                        'title'   => (string) $item->title,
-                        'link'    => (string) $item->link,
-                        'pubDate' => (string) $item->pubDate,
-                    ];
-                    if (count($items) >= 10) break;
+                $rss = Http::timeout(5)->get('https://www.nhk.or.jp/rss/news/cat6.xml');
+                if ($rss->successful()) {
+                    $xml = simplexml_load_string($rss->body());
+                    if ($xml) {
+                        $items = [];
+                        foreach ($xml->channel->item as $item) {
+                            $items[] = [
+                                'title'   => (string) $item->title,
+                                'link'    => (string) $item->link,
+                                'pubDate' => (string) $item->pubDate,
+                            ];
+                            if (count($items) >= 10) break;
+                        }
+                        if ($items) {
+                            Cache::put('world_news', $items, 1800);
+                            $worldNews = $items;
+                        }
+                    }
                 }
-                return $items;
             } catch (\Throwable) {
-                return [];
+                // 取得失敗時はキャッシュしない（次回リクエストで再試行）
             }
-        });
+        }
 
         return view('home.index', compact('setting', 'theme', 'professor', 'recentPosts', 'worldNews'));
     }

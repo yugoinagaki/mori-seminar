@@ -20,6 +20,6 @@ class CaseStudyPageController extends Controller
     {
         $cs = CaseStudy::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
-        return view('case-studies.show', ['cs' => $cs, 'showWipe' => true]);
+        return view('case-studies.show', ['cs' => $cs]);
     }
 }
