@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\AnnualThemeObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
+
+#[ObservedBy(AnnualThemeObserver::class)]
 
 class AnnualTheme extends Model
 {

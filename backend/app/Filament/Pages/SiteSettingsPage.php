@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Actions\MediaPickerAction;
+use App\Models\MediaFile;
 use App\Models\SiteSetting;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -9,6 +11,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SiteSettingsPage extends Page implements HasForms
@@ -68,6 +71,7 @@ class SiteSettingsPage extends Page implements HasForms
                             ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。圧縮してから再度アップロードしてください。'])
                             ->deletable()
                             ->nullable()
+                            ->hintAction(MediaPickerAction::make('hero_image_url', 'hero'))
                             ->helperText('JPG・PNG・WebP対応。上限 5 MB。✕ボタンで削除するとグラデーション背景に戻ります。'),
                     ]),
             ])
@@ -87,7 +91,8 @@ class SiteSettingsPage extends Page implements HasForms
                 ->maxSize(5 * 1024)
                 ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。圧縮してから再度アップロードしてください。'])
                 ->deletable()
-                ->nullable();
+                ->nullable()
+                ->hintAction(MediaPickerAction::make($name, 'transition'));
 
         return $form
             ->schema([
@@ -143,10 +148,17 @@ class SiteSettingsPage extends Page implements HasForms
             }
         }
 
-        $setting->update([
-            'hero_image_url'        => $hero,
-            'transition_image_urls' => $transitions ?: null,
-        ]);
+        DB::transaction(function () use ($setting, $hero, $transitions) {
+            $setting->update([
+                'hero_image_url'        => $hero,
+                'transition_image_urls' => $transitions ?: null,
+            ]);
+
+            if ($hero) MediaFile::track($hero, 'hero');
+            foreach ($transitions as $path) {
+                MediaFile::track($path, 'transition');
+            }
+        });
 
         // Delete orphaned files from storage
         if ($oldHero && $hero !== $oldHero) {

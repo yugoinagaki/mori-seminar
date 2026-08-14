@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\MediaPickerAction;
 use App\Filament\Resources\AnnualThemeResource\Pages;
 use App\Filament\Resources\AnnualThemeResource\RelationManagers;
 use App\Models\AnnualTheme;
@@ -44,6 +45,7 @@ class AnnualThemeResource extends Resource
                     ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。'])
                     ->deletable()
                     ->nullable()
+                    ->hintAction(MediaPickerAction::make('photo_url', 'theme-photo'))
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('slideshow_photo_urls')
                     ->label('トップページ用 スライドショー写真（最大10枚）')
@@ -60,6 +62,7 @@ class AnnualThemeResource extends Resource
                     ->reorderable()
                     ->deletable()
                     ->nullable()
+                    ->hintAction(MediaPickerAction::make('slideshow_photo_urls', 'slideshow', true))
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('content')
                     ->label('本文')
