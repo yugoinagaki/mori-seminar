@@ -29,9 +29,18 @@ class MediaPickerAction
                 if ($collection) {
                     $query->where('collection', $collection);
                 }
-                $options = $query->get()->mapWithKeys(
-                    fn ($m) => [$m->path => "[{$m->collection}]  {$m->original_name}  ({$m->humanSize()})"]
-                );
+                $options = $query->get()->mapWithKeys(function ($m) {
+                    $thumb = $m->isImage()
+                        ? '<img src="' . e($m->url()) . '" style="height:44px;width:60px;object-fit:cover;border-radius:3px;flex-shrink:0">'
+                        : '<span style="font-size:1.6em;line-height:1;flex-shrink:0">📄</span>';
+                    $label = '<span style="display:inline-flex;align-items:center;gap:10px">'
+                        . $thumb
+                        . '<span style="display:flex;flex-direction:column;gap:2px">'
+                        . '<span style="font-weight:500">' . e($m->original_name) . '</span>'
+                        . '<span style="font-size:0.78em;color:#6b7280">[' . e($m->collection) . '] ' . $m->humanSize() . '</span>'
+                        . '</span></span>';
+                    return [$m->path => $label];
+                });
 
                 $fields = [
                     Forms\Components\Select::make('selected_paths')
@@ -39,6 +48,7 @@ class MediaPickerAction
                         ->options($options)
                         ->multiple($multiple)
                         ->searchable()
+                        ->allowHtml()
                         ->required()
                         ->reactive(),
                 ];

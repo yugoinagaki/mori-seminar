@@ -25,18 +25,19 @@ class MediaFileResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
-                    ->label('プレビュー')
+                    ->label('')
                     ->disk('public')
-                    ->height(56)
-                    ->width(80)
-                    ->defaultImageUrl(asset('images/file-icon.svg'))
-                    ->visible(fn ($record) => $record?->isImage()),
+                    ->height(160)
+                    ->width('100%')
+                    ->extraImgAttributes(['style' => 'width:100%;height:160px;object-fit:cover;border-radius:6px 6px 0 0'])
+                    ->defaultImageUrl(asset('images/file-icon.svg')),
                 Tables\Columns\TextColumn::make('original_name')
                     ->label('ファイル名')
                     ->searchable()
-                    ->limit(40),
+                    ->limit(28)
+                    ->weight('medium'),
                 Tables\Columns\BadgeColumn::make('collection')
-                    ->label('アップロード元')
+                    ->label('')
                     ->colors([
                         'primary'   => 'hero',
                         'success'   => 'slideshow',
@@ -44,20 +45,20 @@ class MediaFileResource extends Resource
                         'gray'      => 'theme-photo',
                         'danger'    => fn ($state) => !in_array($state, ['hero', 'slideshow', 'transition', 'theme-photo']),
                     ]),
-                Tables\Columns\TextColumn::make('mime_type')
-                    ->label('種別')
-                    ->formatStateUsing(fn ($state) => match (true) {
-                        str_starts_with($state ?? '', 'image/') => '🖼 画像',
-                        $state === 'application/pdf'            => '📄 PDF',
-                        default                                 => $state ?? '—',
-                    }),
                 Tables\Columns\TextColumn::make('size')
-                    ->label('サイズ')
-                    ->formatStateUsing(fn ($state, $record) => $record->humanSize()),
+                    ->label('')
+                    ->formatStateUsing(fn ($state, $record) => $record->humanSize())
+                    ->color('gray'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('登録日時')
+                    ->label('')
                     ->dateTime('Y/m/d H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->color('gray'),
+            ])
+            ->contentGrid([
+                'sm' => 2,
+                'md' => 3,
+                'xl' => 4,
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('collection')
