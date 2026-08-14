@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\MediaPickerAction;
 use App\Filament\Resources\ProfessorResource\Pages;
 use App\Models\Professor;
 use Filament\Forms;
@@ -114,6 +115,74 @@ class ProfessorResource extends Resource
                             ->columns(4)
                             ->addActionLabel('受賞歴を追加')
                             ->nullable(),
+                    ])
+                    ->columnSpan(3),
+
+                Forms\Components\Section::make('著書・論文')
+                    ->description('ドラッグで並び替え可能。表紙画像・タイトル・出版年・出版社・説明文を入力してください。')
+                    ->schema([
+                        Forms\Components\Repeater::make('books')
+                            ->label('')
+                            ->schema([
+                                Forms\Components\Grid::make(4)->schema([
+                                    Forms\Components\FileUpload::make('cover_url')
+                                        ->label('表紙画像')
+                                        ->image()
+                                        ->disk('public')
+                                        ->directory('professor/books')
+                                        ->imagePreviewHeight('140')
+                                        ->maxSize(5 * 1024)
+                                        ->nullable()
+                                        ->hintAction(MediaPickerAction::make('cover_url')),
+                                    Forms\Components\TextInput::make('title')
+                                        ->label('タイトル')
+                                        ->required()
+                                        ->columnSpan(3),
+                                    Forms\Components\TextInput::make('year')
+                                        ->label('出版年')
+                                        ->numeric()
+                                        ->minValue(1900)
+                                        ->maxValue(2099),
+                                    Forms\Components\TextInput::make('publisher')
+                                        ->label('出版社')
+                                        ->columnSpan(2),
+                                    Forms\Components\TextInput::make('url')
+                                        ->label('リンク（Amazon等）')
+                                        ->url()
+                                        ->placeholder('https://...')
+                                        ->columnSpan(1),
+                                    Forms\Components\Textarea::make('description')
+                                        ->label('説明文')
+                                        ->rows(2)
+                                        ->columnSpanFull(),
+                                ]),
+                            ])
+                            ->itemLabel(fn (array $state): string => $state['title'] ?? '（タイトル未入力）')
+                            ->addActionLabel('著書・論文を追加')
+                            ->reorderable()
+                            ->collapsible()
+                            ->collapsed()
+                            ->nullable(),
+                    ])
+                    ->columnSpan(3),
+
+                Forms\Components\Section::make('ギャラリー写真')
+                    ->description('教授・研究室に関する写真を複数枚登録できます。ドラッグで並び替え可能。')
+                    ->schema([
+                        Forms\Components\FileUpload::make('gallery_photo_urls')
+                            ->label('')
+                            ->image()
+                            ->multiple()
+                            ->maxFiles(20)
+                            ->disk('public')
+                            ->directory('professor/gallery')
+                            ->visibility('public')
+                            ->imagePreviewHeight('120')
+                            ->maxSize(5 * 1024)
+                            ->reorderable()
+                            ->deletable()
+                            ->nullable()
+                            ->hintAction(MediaPickerAction::make('gallery_photo_urls', null, true)),
                     ])
                     ->columnSpan(3),
             ])

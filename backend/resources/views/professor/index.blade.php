@@ -108,8 +108,68 @@
                     </dl>
                 </div>
                 @endif
+
+                @if(!empty($professor?->books))
+                <div>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">著書・論文</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        @foreach($professor->books as $book)
+                        @php
+                            $cover = is_array($book['cover_url'] ?? null)
+                                ? (reset($book['cover_url']) ?: null)
+                                : ($book['cover_url'] ?? null);
+                        @endphp
+                        <div class="group flex flex-col">
+                            @if($cover)
+                            <a href="{{ $book['url'] ?? '#' }}" target="{{ $book['url'] ? '_blank' : '_self' }}"
+                               class="{{ $book['url'] ? '' : 'pointer-events-none' }}">
+                                <div class="aspect-[2/3] overflow-hidden bg-gray-100 mb-3 shadow-sm">
+                                    <img src="{{ storage_url($cover) }}"
+                                         alt="{{ $book['title'] ?? '' }}"
+                                         class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300">
+                                </div>
+                            </a>
+                            @endif
+                            <p class="text-sm font-semibold text-gray-900 leading-snug">{{ $book['title'] ?? '' }}</p>
+                            @if(!empty($book['year']) || !empty($book['publisher']))
+                            <p class="text-xs text-gray-400 mt-1">
+                                {{ collect([$book['year'] ?? null, $book['publisher'] ?? null])->filter()->implode(' · ') }}
+                            </p>
+                            @endif
+                            @if(!empty($book['description']))
+                            <p class="text-xs text-gray-500 mt-2 leading-relaxed">{{ $book['description'] }}</p>
+                            @endif
+                            @if(!empty($book['url']))
+                            <a href="{{ $book['url'] }}" target="_blank"
+                               class="inline-block mt-2 text-xs text-primary-600 hover:underline">詳細を見る →</a>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
+
+        {{-- Gallery --}}
+        @if(!empty($professor?->gallery_photo_urls))
+        <div class="mt-16">
+            <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">ギャラリー</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                @foreach($professor->gallery_photo_urls as $photo)
+                @php $photoPath = is_array($photo) ? (reset($photo) ?: null) : $photo; @endphp
+                @if($photoPath)
+                <div class="aspect-square overflow-hidden bg-gray-100">
+                    <img src="{{ storage_url($photoPath) }}"
+                         alt="ギャラリー"
+                         loading="lazy"
+                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                @endif
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

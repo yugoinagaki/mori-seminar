@@ -11,11 +11,14 @@ class Professor extends Model
     protected $fillable = [
         'name', 'name_en', 'title', 'bio',
         'profile_image_url', 'career', 'awards', 'research_themes',
+        'books', 'gallery_photo_urls',
     ];
 
     protected $casts = [
-        'career'           => 'array',
-        'awards'           => 'array',
-        'research_themes'  => 'array',
+        'career'             => 'array',
+        'awards'             => 'array',
+        'research_themes'    => 'array',
+        'books'              => 'array',
+        'gallery_photo_urls' => 'array',
     ];
 }
