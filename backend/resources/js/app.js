@@ -598,12 +598,25 @@ function initHomeSlideshow() {
         inner.style.animation = `${KB_ANIMS[index % KB_ANIMS.length]} 6s ease forwards`;
     }
 
+    // Lazy-load: set background-image from data-bg on demand
+    function loadBg(slide) {
+        const inner = slide.querySelector('.kb-inner');
+        if (inner && inner.dataset.bg) {
+            inner.style.backgroundImage = `url('${inner.dataset.bg}')`;
+            delete inner.dataset.bg;
+        }
+    }
+
     function goTo(next) {
         if (transitioning || next === current) return;
         transitioning = true;
 
         const prev = current;
         current = next;
+
+        loadBg(slides[next]); // load image just before showing
+        // preload the one after that too
+        loadBg(slides[(next + 1) % slides.length]);
 
         slides[prev].style.opacity = '0';
         slides[next].style.opacity = '1';

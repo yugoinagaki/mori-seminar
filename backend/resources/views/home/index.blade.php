@@ -177,7 +177,12 @@
                 <div class="kb-slide absolute inset-0 {{ $i === 0 ? 'is-active' : '' }}"
                      style="opacity: {{ $i === 0 ? 1 : 0 }}; transition: opacity 1.2s ease">
                     <div class="kb-inner absolute inset-0 bg-cover bg-center"
-                         style="background-image: url('{{ storage_url($photo) }}')"></div>
+                         @if($i === 0)
+                         style="background-image: url('{{ storage_url($photo) }}')"
+                         @else
+                         data-bg="{{ storage_url($photo) }}"
+                         @endif
+                    ></div>
                     <div class="absolute inset-0" style="background: rgba(4,28,51,0.18)"></div>
                 </div>
                 @endforeach
