@@ -71,7 +71,7 @@ class SiteSettingsPage extends Page implements HasForms
                             ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。圧縮してから再度アップロードしてください。'])
                             ->deletable()
                             ->nullable()
-                            ->hintAction(MediaPickerAction::make('hero_image_url', 'hero'))
+                            ->hintAction(MediaPickerAction::make('hero_image_url'))
                             ->helperText('JPG・PNG・WebP対応。上限 5 MB。✕ボタンで削除するとグラデーション背景に戻ります。'),
                     ]),
             ])
@@ -92,7 +92,7 @@ class SiteSettingsPage extends Page implements HasForms
                 ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。圧縮してから再度アップロードしてください。'])
                 ->deletable()
                 ->nullable()
-                ->hintAction(MediaPickerAction::make($name, 'transition'));
+                ->hintAction(MediaPickerAction::make($name));
 
         return $form
             ->schema([
