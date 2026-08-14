@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\ImageManager;
 
 class MediaFile extends Model
 {
@@ -15,16 +17,39 @@ class MediaFile extends Model
      */
     public static function track(string $path, string $collection, string $disk = 'public'): self
     {
-        return static::firstOrCreate(
+        $mime = rescue(fn () => Storage::disk($disk)->mimeType($path), null, false);
+
+        $record = static::firstOrCreate(
             ['path' => $path],
             [
                 'disk'          => $disk,
                 'collection'    => $collection,
                 'original_name' => basename($path),
-                'mime_type'     => rescue(fn () => Storage::disk($disk)->mimeType($path), null, false),
+                'mime_type'     => $mime,
                 'size'          => rescue(fn () => Storage::disk($disk)->size($path), 0, false),
             ]
         );
+
+        if ($record->wasRecentlyCreated && str_starts_with($mime ?? '', 'image/')) {
+            static::optimizeImage($disk, $path, $record);
+        }
+
+        return $record;
+    }
+
+    private static function optimizeImage(string $disk, string $path, self $record): void
+    {
+        try {
+            $fullPath = Storage::disk($disk)->path($path);
+            $image = (new ImageManager(new GdDriver()))->decodePath($fullPath);
+            if ($image->width() > 1920) {
+                $image->scaleDown(width: 1920);
+            }
+            $image->save($fullPath, quality: 85);
+            $record->update(['size' => Storage::disk($disk)->size($path)]);
+        } catch (\Throwable) {
+            // 圧縮失敗時はオリジナルをそのまま使用
+        }
     }
 
     public function url(): string
