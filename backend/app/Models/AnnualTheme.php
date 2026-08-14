@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AnnualTheme extends Model
 {
-    protected $fillable = ['year', 'title', 'content', 'photo_url'];
+    protected $fillable = ['year', 'title', 'content', 'photo_url', 'slideshow_photo_urls'];
+
+    protected $casts = [
+        'slideshow_photo_urls' => 'array',
+    ];
 }

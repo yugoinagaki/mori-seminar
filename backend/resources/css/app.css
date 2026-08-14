@@ -202,5 +202,27 @@
     outline-color: rgba(245, 158, 11, 0.9);
 }
 
+/* ── Ken Burns slideshow ─────────────────────────────────────────────────────── */
+@keyframes kb-zoom-in {
+    from { transform: scale(1)    translate(0, 0); }
+    to   { transform: scale(1.12) translate(0, 0); }
+}
+@keyframes kb-zoom-out {
+    from { transform: scale(1.12) translate(0, 0); }
+    to   { transform: scale(1)    translate(0, 0); }
+}
+@keyframes kb-pan-right {
+    from { transform: scale(1.1) translate(-2%, 0); }
+    to   { transform: scale(1.1) translate(2%, 0); }
+}
+@keyframes kb-pan-left {
+    from { transform: scale(1.1) translate(2%, -1%); }
+    to   { transform: scale(1.1) translate(-2%, 1%); }
+}
+
+.kb-inner {
+    animation: kb-zoom-in 6s ease forwards;
+}
+
 /* Dynamic type badge classes — must appear in source for Tailwind to include them */
 /* bg-primary-700 text-white bg-emerald-700 text-white bg-amber-600 text-white bg-rose-700 text-white bg-gray-200 text-gray-600 */

@@ -134,6 +134,71 @@
 </div>
 @endif
 
+{{-- ANNUAL THEME --}}
+@if($theme)
+@php $slideshowPhotos = array_values(array_filter((array)($theme->slideshow_photo_urls ?? []))); @endphp
+<section class="py-28 relative overflow-hidden"
+         style="background: linear-gradient(140deg, #0d5189 0%, #1a79c0 100%)">
+    {{-- decorative circles (only when no slideshow) --}}
+    @if(empty($slideshowPhotos))
+    <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full border border-white/8 pointer-events-none"></div>
+    <div class="absolute -right-20 -top-20 w-[360px] h-[360px] rounded-full border border-white/6 pointer-events-none"></div>
+    @endif
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-14">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center fade-in">
+
+            {{-- LEFT: text --}}
+            <div>
+                <p class="text-white/35 text-[10px] tracking-[0.35em] uppercase font-light mb-8">Annual Theme</p>
+                <div class="text-white/12 font-bold leading-none mb-2 select-none"
+                     style="font-size: clamp(5rem, 15vw, 10rem)">{{ $theme->year }}</div>
+                <h2 class="text-white text-2xl md:text-3xl font-bold mb-10 leading-tight -mt-2"
+                    data-editable data-model="annual_theme" data-id="{{ $theme->id }}" data-field="title">
+                    {{ $theme->title }}
+                </h2>
+                <a href="/theme"
+                   class="inline-flex items-center gap-3 text-white text-sm font-medium border-b border-white/35 pb-0.5 hover:border-white hover:gap-4 transition-all"
+                   data-wipe-link>
+                    テーマ詳細を読む
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+            </div>
+
+            {{-- RIGHT: slideshow --}}
+            @if(!empty($slideshowPhotos))
+            <div id="home-slideshow"
+                 class="relative overflow-hidden select-none"
+                 style="aspect-ratio: 4/3">
+                {{-- slides --}}
+                @foreach($slideshowPhotos as $i => $photo)
+                <div class="kb-slide absolute inset-0 {{ $i === 0 ? 'is-active' : '' }}"
+                     style="opacity: {{ $i === 0 ? 1 : 0 }}; transition: opacity 1.2s ease">
+                    <div class="kb-inner absolute inset-0 bg-cover bg-center"
+                         style="background-image: url('{{ storage_url($photo) }}')"></div>
+                    <div class="absolute inset-0" style="background: rgba(4,28,51,0.18)"></div>
+                </div>
+                @endforeach
+
+                {{-- dots --}}
+                @if(count($slideshowPhotos) > 1)
+                <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+                    @foreach($slideshowPhotos as $i => $photo)
+                    <button class="kb-dot transition-all duration-300 rounded-full {{ $i === 0 ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40' }}"
+                            data-index="{{ $i }}" aria-label="スライド {{ $i + 1 }}"></button>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+            @endif
+
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- NEWS --}}
 <section class="py-24 bg-white">
     <div class="max-w-7xl mx-auto px-6 md:px-14">
@@ -179,40 +244,6 @@
         </ul>
     </div>
 </section>
-
-{{-- ANNUAL THEME --}}
-@if($theme)
-<section class="py-28 relative overflow-hidden"
-         style="background: linear-gradient(140deg, #0d5189 0%, #1a79c0 100%)">
-    <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full border border-white/8 pointer-events-none"></div>
-    <div class="absolute -right-20 -top-20 w-[360px] h-[360px] rounded-full border border-white/6 pointer-events-none"></div>
-    <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-14 fade-in">
-        <div class="max-w-2xl">
-            <p class="text-white/35 text-[10px] tracking-[0.35em] uppercase font-light mb-8">Annual Theme</p>
-            <div class="text-white/12 font-bold leading-none mb-2 select-none"
-                 style="font-size: clamp(5rem, 15vw, 10rem)">{{ $theme->year }}</div>
-            <h2 class="text-white text-2xl md:text-3xl font-bold mb-7 leading-tight -mt-2"
-                data-editable data-model="annual_theme" data-id="{{ $theme->id }}" data-field="title">
-                {{ $theme->title }}
-            </h2>
-            @if($theme->content)
-            <div class="text-white/65 text-sm md:text-base leading-[2] mb-10 line-clamp-3"
-                 data-editable data-model="annual_theme" data-id="{{ $theme->id }}" data-field="content">
-                {!! $theme->content !!}
-            </div>
-            @endif
-            <a href="/theme"
-               class="inline-flex items-center gap-3 text-white text-sm font-medium border-b border-white/35 pb-0.5 hover:border-white hover:gap-4 transition-all"
-               data-wipe-link>
-                テーマ詳細を読む
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-        </div>
-    </div>
-</section>
-@endif
 
 {{-- PROFESSOR --}}
 @if($professor)

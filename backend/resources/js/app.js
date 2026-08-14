@@ -574,6 +574,66 @@ function initCreateModal() {
     });
 }
 
+// ─── K. Home slideshow (Ken Burns) ───────────────────────────────────────────
+function initHomeSlideshow() {
+    const container = document.getElementById('home-slideshow');
+    if (!container) return;
+
+    const slides = [...container.querySelectorAll('.kb-slide')];
+    const dots   = [...container.querySelectorAll('.kb-dot')];
+    if (slides.length < 2) return;
+
+    const KB_ANIMS    = ['kb-zoom-in', 'kb-zoom-out', 'kb-pan-right', 'kb-pan-left'];
+    const INTERVAL    = 5000;
+    const FADE_MS     = 1200;
+    let current       = 0;
+    let timer         = null;
+    let transitioning = false;
+
+    function applyKb(slide, index) {
+        const inner = slide.querySelector('.kb-inner');
+        if (!inner) return;
+        inner.style.animation = 'none';
+        inner.getBoundingClientRect(); // force reflow to restart animation
+        inner.style.animation = `${KB_ANIMS[index % KB_ANIMS.length]} 6s ease forwards`;
+    }
+
+    function goTo(next) {
+        if (transitioning || next === current) return;
+        transitioning = true;
+
+        const prev = current;
+        current = next;
+
+        slides[prev].style.opacity = '0';
+        slides[next].style.opacity = '1';
+        applyKb(slides[next], next);
+
+        dots.forEach((d, i) => {
+            d.className = i === next
+                ? 'kb-dot transition-all duration-300 rounded-full w-5 h-1.5 bg-white'
+                : 'kb-dot transition-all duration-300 rounded-full w-1.5 h-1.5 bg-white/40';
+        });
+
+        setTimeout(() => { transitioning = false; }, FADE_MS);
+    }
+
+    function advance() { goTo((current + 1) % slides.length); }
+
+    function startTimer() { timer = setInterval(advance, INTERVAL); }
+    function stopTimer()  { clearInterval(timer); }
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => { stopTimer(); goTo(i); startTimer(); });
+    });
+
+    container.addEventListener('mouseenter', stopTimer);
+    container.addEventListener('mouseleave', startTimer);
+
+    applyKb(slides[0], 0);
+    startTimer();
+}
+
 // ─── J. Hero title morph (EN words sequential → slide-out → JA char-by-char) ─
 function initMorphTitle() {
     const h1   = document.getElementById('hero-title');
@@ -655,4 +715,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initInlineEdit();
     initCreateModal();
     initMorphTitle();
+    initHomeSlideshow();
 });
