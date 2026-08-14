@@ -24,12 +24,29 @@ class AnnualThemeResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('year')
+                    ->label('年度')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('title')
+                    ->label('テーマタイトル')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Forms\Components\FileUpload::make('photo_url')
+                    ->label('ゼミ集合写真')
+                    ->helperText('ヒーロー右側・本文上部に表示されます。推奨: 横長（16:9 以上）・5 MB 以下。')
+                    ->image()
+                    ->disk('public')
+                    ->directory('theme-photos')
+                    ->visibility('public')
+                    ->imagePreviewHeight('220')
+                    ->maxSize(5 * 1024)
+                    ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。'])
+                    ->deletable()
+                    ->nullable()
+                    ->columnSpanFull(),
                 Forms\Components\Textarea::make('content')
+                    ->label('本文')
                     ->columnSpanFull(),
             ]);
     }
@@ -39,10 +56,17 @@ class AnnualThemeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('year')
+                    ->label('年度')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->label('テーマ')
                     ->searchable(),
+                Tables\Columns\ImageColumn::make('photo_url')
+                    ->label('集合写真')
+                    ->disk('public')
+                    ->height(48)
+                    ->defaultImageUrl(null),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

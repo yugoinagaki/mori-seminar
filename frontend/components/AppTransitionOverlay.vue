@@ -1,11 +1,40 @@
 <script setup lang="ts">
 const { visible, animKey } = usePageTransition()
+const config = useRuntimeConfig()
+const storageBase = config.public.storageBase as string
+const apiBase = config.public.apiBase as string
+
+const transitionImages = useState<string[]>('transition-images', () => [])
+const bgUrl = ref('/forest.png')
+
+function toFullUrl(path: string): string {
+  if (!path) return '/forest.png'
+  if (path.startsWith('http')) return path
+  return `${storageBase}/${path}`
+}
+
+onMounted(async () => {
+  if (transitionImages.value.length === 0) {
+    try {
+      const settings = await $fetch<{ transition_image_urls?: string[] | null }>(`${apiBase}/settings`)
+      transitionImages.value = settings?.transition_image_urls ?? []
+    } catch {}
+  }
+})
+
+watch(animKey, () => {
+  const imgs = transitionImages.value
+  if (imgs.length > 0) {
+    const raw = imgs[Math.floor(Math.random() * imgs.length)]
+    bgUrl.value = toFullUrl(raw)
+  }
+})
 </script>
 
 <template>
   <ClientOnly>
     <div v-if="visible" :key="animKey" class="wipe-wrapper">
-      <div class="wipe-forest" />
+      <div class="wipe-forest" :style="`background-image: url('${bgUrl}')`" />
     </div>
   </ClientOnly>
 </template>
@@ -23,8 +52,9 @@ const { visible, animKey } = usePageTransition()
 .wipe-forest {
   position: absolute;
   inset: 0;
-  background: url('/forest.png') center / cover no-repeat;
-  /* 中心から透明な円が広がり、境目をグラデーションでぼかす */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   -webkit-mask-image: radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
   mask-image:         radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
 }

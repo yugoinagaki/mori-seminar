@@ -134,11 +134,13 @@
     overflow: hidden;
 }
 
-/* Forest image layer with expanding mask */
+/* Forest image layer with expanding mask — background-image is set via inline style */
 .wipe-forest {
     position: absolute;
     inset: 0;
-    background: url('/forest.png') center / cover no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     -webkit-mask-image: radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
     mask-image:         radial-gradient(circle, transparent var(--r), black calc(var(--r) + 35%));
 }
@@ -164,10 +166,13 @@
     overflow: hidden;
 }
 
+/* background-image は JS 側で動的にセットする */
 .wipe-forest-static {
     position: absolute;
     inset: 0;
-    background: url('/forest.png') center / cover no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .wipe-forest-static::after {

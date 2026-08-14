@@ -6,6 +6,7 @@ class HtmlFields
 {
     private const ALLOWED = [
         'annual_theme' => [
+            'year'    => null,
             'title'   => null,
             'content' => 'default',
         ],

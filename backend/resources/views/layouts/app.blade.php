@@ -11,9 +11,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
 
-    @php $forestUrl = asset('forest.png'); @endphp
+    @php
+        $setting = \App\Models\SiteSetting::instance();
+        $transitionImages = collect($setting->transition_image_urls ?? [])
+            ->map(fn($p) => str_starts_with($p, 'http') ? $p : asset('storage/' . $p))
+            ->values()
+            ->all();
+        if (empty($transitionImages)) {
+            $transitionImages = [asset('forest.png')];
+        }
+        $wipeImage = $transitionImages[array_rand($transitionImages)];
+    @endphp
 
-    <link rel="preload" as="image" href="{{ $forestUrl }}">
+    {{-- Preload all transition images so whichever the JS picks is already cached --}}
+    @foreach($transitionImages as $img)
+    <link rel="preload" as="image" href="{{ $img }}">
+    @endforeach
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -22,7 +35,7 @@
     {{-- Page transition wipe overlay --}}
     @if($showWipe ?? false)
         <div id="wipe-overlay" class="wipe-wrapper">
-            <div class="wipe-forest" style="background-image: url('{{ $forestUrl }}')"></div>
+            <div class="wipe-forest" style="background-image: url('{{ $wipeImage }}')"></div>
         </div>
     @endif
 
@@ -173,13 +186,17 @@
     @include('partials.create-modal')
 
     <script>
-        window.FOREST_IMG_URL = @json($forestUrl ?? '');
-        window.__editMode  = {{ session('edit_mode', false) ? 'true' : 'false' }};
-        window.__csrfToken = @json(csrf_token());
-        window.__drafts    = {!! json_encode(
+        window.TRANSITION_IMAGES = @json($transitionImages);
+        window.FOREST_IMG_URL    = @json($wipeImage);
+        window.__editMode        = {{ session('edit_mode', false) ? 'true' : 'false' }};
+        window.__csrfToken       = @json(csrf_token());
+        window.__drafts          = {!! json_encode(
             auth()->check()
-                ? \App\Models\Draft::where('user_id', auth()->id())->count()
-                : 0,
+                ? \App\Models\Draft::where('user_id', auth()->id())
+                    ->select(['model_type', 'model_id', 'field', 'value'])
+                    ->get()
+                    ->toArray()
+                : [],
             JSON_HEX_TAG | JSON_HEX_AMP
         ) !!};
     </script>

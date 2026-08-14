@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     <form wire:submit="save">
-        {{ $this->form }}
+        {{ $this->heroForm }}
+        {{ $this->transitionForm }}
         <div class="mt-6">
             <x-filament::button type="submit">
                 保存する

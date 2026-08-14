@@ -20,13 +20,26 @@ window.initScrollObserver = initScrollObserver;
 const WIPE_PATHS = ['/theme', '/news', '/professor', '/blog', '/members', '/case-studies', '/faq', '/contact'];
 const ANIM_MS    = 1800;
 
+function pickTransitionImage() {
+    const imgs = window.TRANSITION_IMAGES;
+    if (Array.isArray(imgs) && imgs.length > 0) {
+        return imgs[Math.floor(Math.random() * imgs.length)];
+    }
+    return window.FOREST_IMG_URL || '/forest.png';
+}
+
 function createWipeOverlay() {
     const div = document.createElement('div');
     div.id        = 'wipe-overlay-nav';
     div.className = 'wipe-wrapper-static';
     const inner = document.createElement('div');
     inner.className = 'wipe-forest-static';
-    if (window.FOREST_IMG_URL) inner.style.backgroundImage = `url('${window.FOREST_IMG_URL}')`;
+    const imgUrl = pickTransitionImage();
+    if (imgUrl) {
+        inner.style.backgroundImage = `url('${imgUrl}')`;
+        // Pass the chosen image to the destination page so the arrival animation matches
+        try { sessionStorage.setItem('wipe-pending-image', imgUrl); } catch {}
+    }
     div.appendChild(inner);
     document.body.appendChild(div);
     return div;
@@ -40,8 +53,16 @@ function initPageTransition() {
     const overlay = document.getElementById('wipe-overlay');
     if (!overlay) return;
 
-    // Add animation class — the mask on .wipe-wrapper itself grows transparent
-    // and reveals the page. No background clearing needed; the mask handles it.
+    // Sync background-image with the image chosen by the departing page
+    try {
+        const pending = sessionStorage.getItem('wipe-pending-image');
+        if (pending) {
+            const forest = overlay.querySelector('.wipe-forest');
+            if (forest) forest.style.backgroundImage = `url('${pending}')`;
+            sessionStorage.removeItem('wipe-pending-image');
+        }
+    } catch {}
+
     overlay.classList.add('is-animating');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
     setTimeout(() => overlay.remove(), ANIM_MS + 200);
@@ -350,13 +371,14 @@ function initNewsCard() {
 
 // ─── H. Inline editing ────────────────────────────────────────────────────────
 function applyDraftValues() {
-    const drafts = window.__drafts || [];
+    const drafts = Array.isArray(window.__drafts) ? window.__drafts : [];
     drafts.forEach((d) => {
         const el = document.querySelector(
             `[data-editable][data-model="${d.model_type}"][data-id="${d.model_id}"][data-field="${d.field}"]`
         );
         if (el) el.textContent = d.value;
     });
+    updateDraftCount(drafts.length);
 }
 
 function saveDraft(modelType, modelId, field, value) {
@@ -503,11 +525,22 @@ function updateDraftCount(count) {
 function initInlineEdit() {
     if (window.__editMode) {
         enableEditMode();
+        updateEditBarUI(true);
     }
 
     const toggle = document.getElementById('edit-bar-toggle');
     if (toggle) {
         toggle.addEventListener('click', async () => {
+            // 編集モードをオフにしようとしている＆未適用の変更がある場合は警告
+            if (window.__editMode) {
+                const applyBtn = document.getElementById('edit-bar-apply');
+                if (applyBtn && !applyBtn.disabled) {
+                    if (!confirm('未反映の変更があります。変更を破棄して編集モードを終了しますか？\n（「反映する」ボタンで保存してから終了することをお勧めします）')) {
+                        return;
+                    }
+                }
+            }
+
             const res = await fetch('/edit-mode/toggle', {
                 method: 'POST',
                 headers: {
