@@ -7,6 +7,7 @@ use App\Models\MediaFile;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class MediaFileResource extends Resource
 {
@@ -25,19 +26,18 @@ class MediaFileResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')
-                    ->label('')
+                    ->label('プレビュー')
                     ->disk('public')
-                    ->height(160)
-                    ->width('100%')
-                    ->extraImgAttributes(['style' => 'width:100%;height:160px;object-fit:cover;border-radius:6px 6px 0 0'])
+                    ->height(80)
+                    ->width(120)
+                    ->extraImgAttributes(['style' => 'object-fit:cover;border-radius:4px'])
                     ->defaultImageUrl(asset('images/file-icon.svg')),
                 Tables\Columns\TextColumn::make('original_name')
                     ->label('ファイル名')
                     ->searchable()
-                    ->limit(28)
-                    ->weight('medium'),
+                    ->limit(40),
                 Tables\Columns\BadgeColumn::make('collection')
-                    ->label('')
+                    ->label('アップロード元')
                     ->colors([
                         'primary'   => 'hero',
                         'success'   => 'slideshow',
@@ -46,19 +46,12 @@ class MediaFileResource extends Resource
                         'danger'    => fn ($state) => !in_array($state, ['hero', 'slideshow', 'transition', 'theme-photo']),
                     ]),
                 Tables\Columns\TextColumn::make('size')
-                    ->label('')
-                    ->formatStateUsing(fn ($state, $record) => $record->humanSize())
-                    ->color('gray'),
+                    ->label('サイズ')
+                    ->formatStateUsing(fn ($state, $record) => $record->humanSize()),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('')
+                    ->label('登録日時')
                     ->dateTime('Y/m/d H:i')
-                    ->sortable()
-                    ->color('gray'),
-            ])
-            ->contentGrid([
-                'sm' => 2,
-                'md' => 3,
-                'xl' => 4,
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('collection')
@@ -87,11 +80,24 @@ class MediaFileResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->label('削除')
                     ->requiresConfirmation()
-                    ->modalDescription('メディアライブラリから削除します。ファイル自体はサーバーに残ります。'),
+                    ->modalDescription('ファイルをストレージから完全に削除します。この操作は取り消せません。')
+                    ->before(fn ($record) => Storage::disk($record->disk)->delete($record->path)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('選択を削除'),
+                    Tables\Actions\BulkAction::make('delete')
+                        ->label('選択を削除')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalDescription('選択したファイルをストレージから完全に削除します。この操作は取り消せません。')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                Storage::disk($record->disk)->delete($record->path);
+                                $record->delete();
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }
