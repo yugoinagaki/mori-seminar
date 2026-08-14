@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MediaFileResource\Pages;
 use App\Models\MediaFile;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -72,11 +73,10 @@ class MediaFileResource extends Resource
                 Tables\Actions\Action::make('copy_url')
                     ->label('URLコピー')
                     ->icon('heroicon-o-clipboard')
-                    ->action(fn () => null)
-                    ->extraAttributes(fn ($record) => [
-                        'x-data' => '',
-                        'x-on:click' => "navigator.clipboard.writeText('" . addslashes($record->url()) . "').then(() => window.\$notification?.success('URLをコピーしました'))",
-                    ]),
+                    ->action(function ($record, $livewire) {
+                        $livewire->dispatch('copy-to-clipboard', url: $record->url());
+                        Notification::make()->title('URLをコピーしました')->success()->send();
+                    }),
                 Tables\Actions\DeleteAction::make()
                     ->label('削除')
                     ->requiresConfirmation()
@@ -84,21 +84,19 @@ class MediaFileResource extends Resource
                     ->before(fn ($record) => Storage::disk($record->disk)->delete($record->path)),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('delete')
-                        ->label('選択を削除')
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation()
-                        ->modalDescription('選択したファイルをストレージから完全に削除します。この操作は取り消せません。')
-                        ->action(function ($records) {
-                            foreach ($records as $record) {
-                                Storage::disk($record->disk)->delete($record->path);
-                                $record->delete();
-                            }
-                        })
-                        ->deselectRecordsAfterCompletion(),
-                ]),
+                Tables\Actions\BulkAction::make('delete')
+                    ->label('選択したファイルを一括削除')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalDescription('選択したファイルをストレージから完全に削除します。この操作は取り消せません。')
+                    ->action(function ($records) {
+                        foreach ($records as $record) {
+                            Storage::disk($record->disk)->delete($record->path);
+                            $record->delete();
+                        }
+                    })
+                    ->deselectRecordsAfterCompletion(),
             ]);
     }
 
