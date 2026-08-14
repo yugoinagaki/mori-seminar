@@ -64,8 +64,7 @@ class MediaPickerAction
 
                         return new HtmlString('<div class="flex flex-wrap gap-3 mt-1">' . $imgs . '</div>');
                     })
-                    ->hidden(fn (Forms\Get $get) => empty($get('selected_paths'))),
-                ;
+                    ->hidden(fn (Forms\Get $get) => empty($get('selected_paths')));
 
                 return $fields;
             })
