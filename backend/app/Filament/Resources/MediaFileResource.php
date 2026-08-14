@@ -81,7 +81,7 @@ class MediaFileResource extends Resource
                     ->action(fn () => null)
                     ->extraAttributes(fn ($record) => [
                         'x-data' => '',
-                        'x-on:click' => "navigator.clipboard.writeText('" . addslashes($record->url()) . "').then(() => window.$notification?.success('URLをコピーしました'))",
+                        'x-on:click' => "navigator.clipboard.writeText('" . addslashes($record->url()) . "').then(() => window.\$notification?.success('URLをコピーしました'))",
                     ]),
                 Tables\Actions\DeleteAction::make()
                     ->label('削除')
