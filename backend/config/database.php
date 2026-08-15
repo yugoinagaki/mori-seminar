@@ -99,6 +99,19 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        'wordpress' => [
+            'driver'    => 'mysql',
+            'host'      => env('WP_DB_HOST', '127.0.0.1'),
+            'port'      => env('WP_DB_PORT', '3306'),
+            'database'  => env('WP_DB_DATABASE', ''),
+            'username'  => env('WP_DB_USERNAME', ''),
+            'password'  => env('WP_DB_PASSWORD', ''),
+            'charset'   => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix'    => '',
+            'strict'    => false,
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
