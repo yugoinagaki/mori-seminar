@@ -680,10 +680,11 @@ function initMorphTitle() {
         const textCenter = first && last
             ? (first.left + last.right) / 2
             : window.innerWidth / 2;
-        const offsetX = Math.round(window.innerWidth / 2 - textCenter);
+        // 中央を超えてさらに右へ（+30vw分オーバーシュート）
+        const offsetX = Math.round(window.innerWidth / 2 - textCenter + window.innerWidth * 0.3);
         h1.style.transition = 'opacity 0.45s ease-in, transform 0.45s ease-in';
         h1.style.opacity    = '0';
-        h1.style.transform  = `translateX(${offsetX}px) scale(2.2)`;
+        h1.style.transform  = `translateX(${offsetX}px) scale(2.4)`;
 
         // Step 3: Replace with Japanese chars, one by one (hero-char style)
         setTimeout(() => {
