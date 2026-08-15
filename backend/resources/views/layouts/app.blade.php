@@ -81,7 +81,7 @@
             </ul>
 
             {{-- Mobile toggle --}}
-            <button id="mobile-menu-btn" class="lg:hidden text-white p-1" aria-label="メニューを開く">
+            <button id="mobile-menu-btn" data-mobile-toggle class="lg:hidden text-white p-1" aria-label="メニューを開く">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                           d="M4 6h16M4 12h16M4 18h16"/>
@@ -90,7 +90,7 @@
         </div>
 
         {{-- Mobile menu --}}
-        <div id="mobile-menu" class="hidden lg:hidden bg-primary-900 border-t border-white/10">
+        <div id="mobile-menu" data-mobile-menu class="hidden lg:hidden bg-primary-900 border-t border-white/10">
             <ul class="px-6 py-5 space-y-4">
                 @foreach($navLinks as $link)
                 <li>
