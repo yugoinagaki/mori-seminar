@@ -673,9 +673,12 @@ function initMorphTitle() {
 
     // Step 2: Slide h1 out (left on desktop, up on mobile)
     setTimeout(() => {
+        // h1の中心をビューポート中央に揃えながらスケールアウト
+        const rect    = h1.getBoundingClientRect();
+        const offsetX = Math.round(window.innerWidth / 2 - (rect.left + rect.width / 2));
         h1.style.transition = 'opacity 0.45s ease-in, transform 0.45s ease-in';
         h1.style.opacity    = '0';
-        h1.style.transform  = 'scale(2.2)';
+        h1.style.transform  = `translateX(${offsetX}px) scale(2.2)`;
 
         // Step 3: Replace with Japanese chars, one by one (hero-char style)
         setTimeout(() => {
