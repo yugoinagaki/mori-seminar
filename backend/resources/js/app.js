@@ -673,9 +673,14 @@ function initMorphTitle() {
 
     // Step 2: Slide h1 out (left on desktop, up on mobile)
     setTimeout(() => {
-        // h1の中心をビューポート中央に揃えながらスケールアウト
-        const rect    = h1.getBoundingClientRect();
-        const offsetX = Math.round(window.innerWidth / 2 - (rect.left + rect.width / 2));
+        // 実際の文字幅をspanで計測してビューポート中央に向けてスライド
+        const spans   = h1.querySelectorAll('span');
+        const first   = spans[0]?.getBoundingClientRect();
+        const last    = spans[spans.length - 1]?.getBoundingClientRect();
+        const textCenter = first && last
+            ? (first.left + last.right) / 2
+            : window.innerWidth / 2;
+        const offsetX = Math.round(window.innerWidth / 2 - textCenter);
         h1.style.transition = 'opacity 0.45s ease-in, transform 0.45s ease-in';
         h1.style.opacity    = '0';
         h1.style.transform  = `translateX(${offsetX}px) scale(2.2)`;
