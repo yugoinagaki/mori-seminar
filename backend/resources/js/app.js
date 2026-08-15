@@ -133,7 +133,7 @@ function initNavbar() {
     if (!toggle || !menu) return;
 
     function openMenu() {
-        menu.style.display = '';
+        menu.style.display = 'block';
         // Force reflow so transition plays
         menu.getBoundingClientRect();
         menu.classList.remove('opacity-0', '-translate-y-3');
