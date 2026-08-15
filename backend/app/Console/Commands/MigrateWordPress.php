@@ -17,19 +17,21 @@ class MigrateWordPress extends Command
     protected $description = '旧WordPressサイトの記事を新Laravelサイトへ移行する';
 
     // タイトル接頭辞 → type のマッピング（上から順に評価）
+    // 【】付きルールを先に評価し、「森先生」のような部分一致より優先させる
     private const TYPE_RULES = [
         '【NEWS】'              => 'news',
-        '森先生'               => 'news',
-        '森聡先生'              => 'news',
-        '【活動報告】'           => 'activity',
         '【テキスト刊行】'        => 'activity',
+        '【活動報告】'           => 'activity',
         '【レク企画】'           => 'activity',
         '【入ゼミ関連'           => 'admission',
         '【1年生の皆さんへ】'     => 'admission',
         '【ゼミ生の日常】'        => 'blog',
         '期生が森ゼミを選んだ理由】' => 'blog',  // 【N期生が森ゼミを...
-        '期生ブログ】'           => 'blog',       // 【N期生ブログ】
+        '期生ブログ'             => 'blog',       // 【N期生ブログ vol.X】
         '期生の日常】'           => 'blog',
+        // 括弧なしパターンは後に評価（部分一致なので他ルールより後ろ）
+        '森先生'               => 'news',
+        '森聡先生'              => 'news',
     ];
 
     // 旧サイト画像URLの接頭辞パターン（http/https/プロトコル相対）
