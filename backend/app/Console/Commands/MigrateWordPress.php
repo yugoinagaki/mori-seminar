@@ -267,16 +267,26 @@ class MigrateWordPress extends Command
                 ->where('ID', $meta)
                 ->value('guid');
             if ($guid) {
-                return $this->replaceUploadUrl($guid);
+                return $this->toThumbPath($this->replaceUploadUrl($guid));
             }
         }
 
         // フォールバック: 本文中の最初の <img src="...">
+        // content は cleanContent() 後なので src は /storage/legacy/... 形式
         if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/', $content, $m)) {
-            return $m[1];
+            return $this->toThumbPath($m[1]);
         }
 
         return null;
+    }
+
+    // storage_url() が 'storage/' を自動付与するため、先頭の '/storage/' を除去する
+    private function toThumbPath(string $url): string
+    {
+        if (str_starts_with($url, '/storage/')) {
+            return substr($url, strlen('/storage/'));
+        }
+        return $url;
     }
 
     private function resolveExcerpt(string $wpExcerpt, string $content): ?string
