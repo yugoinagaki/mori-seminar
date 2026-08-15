@@ -673,18 +673,20 @@ function initMorphTitle() {
 
     // Step 2: Slide h1 out (left on desktop, up on mobile)
     setTimeout(() => {
-        // 実際の文字幅をspanで計測してビューポート中央に向けてスライド
-        const spans   = h1.querySelectorAll('span');
-        const first   = spans[0]?.getBoundingClientRect();
-        const last    = spans[spans.length - 1]?.getBoundingClientRect();
-        const textCenter = first && last
-            ? (first.left + last.right) / 2
-            : window.innerWidth / 2;
-        // 中央を超えてさらに右へ（+30vw分オーバーシュート）
-        const offsetX = Math.round(window.innerWidth / 2 - textCenter + window.innerWidth * 0.2);
         h1.style.transition = 'opacity 0.45s ease-in, transform 0.45s ease-in';
         h1.style.opacity    = '0';
-        h1.style.transform  = `translateX(${offsetX}px) scale(2.4)`;
+        if (mobile) {
+            // モバイル: 中央のままスケールアップのみ
+            h1.style.transform = 'scale(2.4)';
+        } else {
+            // デスクトップ: 文字中心をビューポート中央に向けてスライド＋スケール
+            const spans      = h1.querySelectorAll('span');
+            const first      = spans[0]?.getBoundingClientRect();
+            const last       = spans[spans.length - 1]?.getBoundingClientRect();
+            const textCenter = first && last ? (first.left + last.right) / 2 : window.innerWidth / 2;
+            const offsetX    = Math.round(window.innerWidth / 2 - textCenter + window.innerWidth * 0.2);
+            h1.style.transform = `translateX(${offsetX}px) scale(2.4)`;
+        }
 
         // Step 3: Replace with Japanese chars, one by one (hero-char style)
         setTimeout(() => {
