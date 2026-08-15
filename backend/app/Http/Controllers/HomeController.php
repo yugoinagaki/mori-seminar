@@ -47,8 +47,8 @@ class HomeController extends Controller
                         }
                     }
                 }
-            } catch (\Throwable) {
-                // 取得失敗時はキャッシュしない（次回リクエストで再試行）
+            } catch (\Throwable $e) {
+                \Log::error('NHK RSS fetch failed: ' . $e->getMessage());
             }
         }
 
