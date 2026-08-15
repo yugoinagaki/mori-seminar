@@ -7,7 +7,6 @@ use App\Models\Post;
 use App\Models\Professor;
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class HomeController extends Controller
 {
@@ -28,11 +27,10 @@ class HomeController extends Controller
 
         if (empty($cached)) {
             try {
-                $rss = Http::timeout(5)
-                    ->withOptions(['curl' => [CURLOPT_SSLVERSION => CURL_SSLVERSION_DEFAULT]])
-                    ->get('https://news.web.nhk/n-data/conf/na/rss/cat6.xml');
-                if ($rss->successful()) {
-                    $xml = simplexml_load_string($rss->body());
+                $ctx  = stream_context_create(['http' => ['timeout' => 5]]);
+                $body = @file_get_contents('https://news.web.nhk/n-data/conf/na/rss/cat6.xml', false, $ctx);
+                if ($body !== false) {
+                    $xml = simplexml_load_string($body);
                     if ($xml) {
                         $items = [];
                         foreach ($xml->channel->item as $item) {
