@@ -188,6 +188,10 @@ class MigrateWordPress extends Command
 
     private function cleanContent(string $content, string $title): string
     {
+        // 0. <style>/<script>ブロックを中身ごと除去（ElementorのインラインCSS等）
+        $content = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $content);
+        $content = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $content);
+
         // 1. 入れ子見出しを修復: <h2><h2 ...>text</h2></h2> → <h2>text</h2>
         $content = preg_replace_callback(
             '/<(h[1-6])>(<\1[^>]*>)(.*?)<\/\1><\/\1>/is',
