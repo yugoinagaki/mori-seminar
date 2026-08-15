@@ -28,7 +28,7 @@ class HomeController extends Controller
 
         if (empty($cached)) {
             try {
-                $rss = Http::timeout(5)->get('https://www.nhk.or.jp/rss/news/cat6.xml');
+                $rss = Http::timeout(5)->get('https://news.web.nhk/n-data/conf/na/rss/cat6.xml');
                 if ($rss->successful()) {
                     $xml = simplexml_load_string($rss->body());
                     if ($xml) {
