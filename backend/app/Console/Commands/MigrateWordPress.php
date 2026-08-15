@@ -296,9 +296,10 @@ class MigrateWordPress extends Command
     private function resolveExcerpt(string $wpExcerpt, string $content): ?string
     {
         if (trim($wpExcerpt) !== '') {
-            return trim($wpExcerpt);
+            return html_entity_decode(trim($wpExcerpt), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
         $text = strip_tags($content);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = preg_replace('/\s+/', ' ', $text);
         return Str::limit(trim($text), 200) ?: null;
     }
