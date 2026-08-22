@@ -25,7 +25,7 @@ function pickTransitionImage() {
     if (Array.isArray(imgs) && imgs.length > 0) {
         return imgs[Math.floor(Math.random() * imgs.length)];
     }
-    return window.FOREST_IMG_URL || '/forest.png';
+    return window.FOREST_IMG_URL || '/forest.jpg';
 }
 
 function createWipeOverlay() {
@@ -169,16 +169,16 @@ function initNavbar() {
 
 // ─── G. Members tab ──────────────────────────────────────────────────────────
 function initMembersTab() {
-    const tabs    = document.querySelectorAll('[data-tab]');
-    const members = document.querySelectorAll('[data-member-status]');
+    const tabs    = document.querySelectorAll('.members-tab-btn[data-tab]');
+    const members = document.querySelectorAll('[data-member-cohort]');
     if (!tabs.length) return;
 
     tabs.forEach((tab) => {
         tab.addEventListener('click', () => {
-            const status = tab.dataset.tab;
+            const selected = tab.dataset.tab;
 
             tabs.forEach((t) => {
-                const active = t.dataset.tab === status;
+                const active = t.dataset.tab === selected;
                 t.classList.toggle('border-primary-700', active);
                 t.classList.toggle('text-primary-700',  active);
                 t.classList.toggle('border-transparent', !active);
@@ -187,12 +187,123 @@ function initMembersTab() {
             });
 
             members.forEach((m) => {
-                m.style.display = m.dataset.memberStatus === status ? '' : 'none';
+                const show = selected === 'all' || m.dataset.memberCohort === selected;
+                m.style.display = show ? '' : 'none';
             });
 
             // Re-run scroll observer after DOM is updated
             setTimeout(() => window.initScrollObserver(), 0);
         });
+    });
+}
+
+// ─── G2. Member detail modal ─────────────────────────────────────────────────
+function initMemberModal() {
+    const modal   = document.getElementById('member-modal');
+    if (!modal) return;
+
+    const overlay = document.getElementById('member-modal-overlay');
+    const panel   = document.getElementById('member-modal-panel');
+    const closeBtn = document.getElementById('member-modal-close');
+    const nameEl    = document.getElementById('member-modal-name');
+    const cohortEl  = document.getElementById('member-modal-cohort');
+    const positionEl = document.getElementById('member-modal-position');
+    const imageEl   = document.getElementById('member-modal-image');
+    const initialWrap = document.getElementById('member-modal-initial');
+    const initialChar = initialWrap?.querySelector('span');
+    const bioEl     = document.getElementById('member-modal-bio');
+    const bioEmpty  = document.getElementById('member-modal-bio-empty');
+
+    let lastFocused = null;
+
+    function open(trigger) {
+        // Skip when inline edit mode is on — clicking a card in edit mode
+        // is likely a mis-click; the editable text fields have their own handlers.
+        if (window.__editMode) return;
+
+        lastFocused = trigger;
+        const { name, cohort, position, imageUrl, initial } = trigger.dataset;
+        const bioTemplate = trigger.querySelector('.member-bio-template');
+        const bioHtml = bioTemplate ? bioTemplate.innerHTML.trim() : '';
+
+        nameEl.textContent = name || '';
+
+        if (cohort) {
+            cohortEl.textContent = `${cohort}期`;
+            cohortEl.classList.remove('hidden');
+        } else {
+            cohortEl.classList.add('hidden');
+        }
+
+        if (position) {
+            positionEl.textContent = position;
+            positionEl.classList.remove('hidden');
+        } else {
+            positionEl.classList.add('hidden');
+        }
+
+        if (imageUrl) {
+            imageEl.src = imageUrl;
+            imageEl.alt = name || '';
+            imageEl.classList.remove('hidden');
+            initialWrap.classList.add('hidden');
+            initialWrap.classList.remove('flex');
+        } else {
+            imageEl.classList.add('hidden');
+            imageEl.removeAttribute('src');
+            if (initialChar) initialChar.textContent = initial || (name ? name.charAt(0) : '');
+            initialWrap.classList.remove('hidden');
+            initialWrap.classList.add('flex');
+        }
+
+        if (bioHtml) {
+            bioEl.innerHTML = bioHtml;
+            bioEl.classList.remove('hidden');
+            bioEmpty.classList.add('hidden');
+        } else {
+            bioEl.innerHTML = '';
+            bioEl.classList.add('hidden');
+            bioEmpty.classList.remove('hidden');
+        }
+
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        requestAnimationFrame(() => {
+            overlay.classList.add('opacity-100');
+            panel.classList.remove('opacity-0', 'translate-y-6', 'scale-[0.98]');
+        });
+
+        closeBtn?.focus({ preventScroll: true });
+    }
+
+    function close() {
+        overlay.classList.remove('opacity-100');
+        panel.classList.add('opacity-0', 'translate-y-6', 'scale-[0.98]');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (lastFocused) {
+                try { lastFocused.focus({ preventScroll: true }); } catch {}
+            }
+        }, 320);
+    }
+
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-open-member-modal]');
+        if (!trigger) return;
+        e.preventDefault();
+        open(trigger);
+    });
+
+    closeBtn?.addEventListener('click', close);
+    overlay?.addEventListener('click', close);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) close();
     });
 }
 
@@ -734,6 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initWipeLinks();
     initNavbar();
     initMembersTab();
+    initMemberModal();
     initFaq();
     initNewsCard();
     initInlineEdit();

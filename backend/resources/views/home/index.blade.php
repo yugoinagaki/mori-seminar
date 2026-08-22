@@ -315,25 +315,43 @@
             </a>
         </div>
         @php
-            $previewMembers = \App\Models\Member::where('status', 'active')->orderBy('order_index')->limit(6)->get();
+            $marqueeMembers = \App\Models\Member::with('cohort')->orderBy('order_index')->get();
+            // Duration proportional to member count for consistent speed
+            $marqueeDuration = max(30, count($marqueeMembers) * 5);
         @endphp
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-            @forelse($previewMembers as $member)
-            <div class="fade-in group cursor-pointer">
-                <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
-                    @if($member->profile_image_url)
-                    <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
-                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
-                    @else
-                    <div class="w-full h-full bg-primary-100 flex items-center justify-center">
-                        <span class="text-primary-300 text-2xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
-                    </div>
-                    @endif
-                </div>
-                <p class="text-sm font-medium text-gray-800">{{ $member->name }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $member->university_year ? $member->university_year . '年' : '' }}</p>
+
+        @if($marqueeMembers->isNotEmpty())
+        <div class="members-marquee-viewport fade-in overflow-hidden -mx-6 md:-mx-14">
+            <div class="members-marquee py-2" style="--marquee-duration: {{ $marqueeDuration }}s;">
+                {{-- Two passes for seamless loop --}}
+                @foreach([1, 2] as $pass)
+                    @foreach($marqueeMembers as $member)
+                    <a href="/members"
+                       class="group shrink-0 w-40 md:w-48 mx-3 md:mx-4 block"
+                       data-wipe-link
+                       aria-hidden="{{ $pass === 2 ? 'true' : 'false' }}"
+                       tabindex="{{ $pass === 2 ? '-1' : '0' }}">
+                        <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
+                            @if($member->profile_image_url)
+                            <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
+                            @else
+                            <div class="w-full h-full bg-primary-100 flex items-center justify-center">
+                                <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
+                            </div>
+                            @endif
+                        </div>
+                        <p class="text-sm font-medium text-gray-800">{{ $member->name }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            {{ $member->cohort?->generation ? $member->cohort->generation . '期' : '' }}{{ $member->position ? ($member->cohort?->generation ? '・' : '') . $member->position : '' }}
+                        </p>
+                    </a>
+                    @endforeach
+                @endforeach
             </div>
-            @empty
+        </div>
+        @else
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
             @for($i = 0; $i < 6; $i++)
             <div class="fade-in">
                 <div class="aspect-square bg-gray-100 mb-3"></div>
@@ -341,8 +359,8 @@
                 <div class="h-2.5 bg-gray-100 rounded w-1/3"></div>
             </div>
             @endfor
-            @endforelse
         </div>
+        @endif
     </div>
 </section>
 

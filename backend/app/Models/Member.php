@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Member extends Model
 {
     protected $fillable = [
-        'name', 'name_kana', 'generation', 'university_year',
-        'major', 'bio', 'profile_image_url', 'status',
-        'graduated_year', 'twitter_url', 'instagram_url', 'order_index',
+        'name', 'cohort_id', 'position', 'bio',
+        'profile_image_url', 'order_index',
     ];
+
+    public function cohort()
+    {
+        return $this->belongsTo(Cohort::class);
+    }
 
     public function caseStudies()
     {

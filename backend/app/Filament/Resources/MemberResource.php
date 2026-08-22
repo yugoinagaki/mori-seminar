@@ -34,29 +34,20 @@ class MemberResource extends Resource
                                 ->required()
                                 ->maxLength(100),
 
-                            Forms\Components\TextInput::make('name_kana')
-                                ->label('氏名（かな）')
-                                ->maxLength(100),
+                            Forms\Components\Select::make('cohort_id')
+                                ->label('期')
+                                ->relationship('cohort', 'generation')
+                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->generation}期")
+                                ->searchable()
+                                ->preload()
+                                ->nullable()
+                                ->helperText('先に「期の管理」で作成した期から選択'),
                         ]),
 
-                        Forms\Components\Grid::make(3)->schema([
-                            Forms\Components\TextInput::make('generation')
-                                ->label('期（例: 3）')
-                                ->numeric()
-                                ->nullable(),
-
-                            Forms\Components\TextInput::make('university_year')
-                                ->label('学年（1〜4）')
-                                ->numeric()
-                                ->minValue(1)
-                                ->maxValue(4)
-                                ->nullable(),
-
-                            Forms\Components\TextInput::make('major')
-                                ->label('専攻・学科')
-                                ->maxLength(100)
-                                ->nullable(),
-                        ]),
+                        Forms\Components\TextInput::make('position')
+                            ->label('役職')
+                            ->maxLength(100)
+                            ->nullable(),
 
                         Forms\Components\Textarea::make('bio')
                             ->label('自己紹介')
@@ -65,26 +56,12 @@ class MemberResource extends Resource
                     ])
                     ->columnSpan(2),
 
-                Forms\Components\Section::make('ステータス・設定')
+                Forms\Components\Section::make('表示設定')
                     ->schema([
                         Forms\Components\FileUpload::make('profile_image_url')
                             ->label('プロフィール画像')
                             ->image()
                             ->directory('members')
-                            ->nullable(),
-
-                        Forms\Components\Select::make('status')
-                            ->label('ステータス')
-                            ->options([
-                                'active' => '現役',
-                                'ob_og'  => 'OB/OG',
-                            ])
-                            ->required()
-                            ->default('active'),
-
-                        Forms\Components\TextInput::make('graduated_year')
-                            ->label('卒業年度')
-                            ->numeric()
                             ->nullable(),
 
                         Forms\Components\TextInput::make('order_index')
@@ -93,20 +70,6 @@ class MemberResource extends Resource
                             ->default(0),
                     ])
                     ->columnSpan(1),
-
-                Forms\Components\Section::make('SNSリンク')
-                    ->schema([
-                        Forms\Components\TextInput::make('twitter_url')
-                            ->label('X (Twitter) URL')
-                            ->url()
-                            ->nullable(),
-
-                        Forms\Components\TextInput::make('instagram_url')
-                            ->label('Instagram URL')
-                            ->url()
-                            ->nullable(),
-                    ])
-                    ->columnSpan(3),
             ])
             ->columns(3);
     }
@@ -124,28 +87,14 @@ class MemberResource extends Resource
                     ->label('氏名')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('generation')
+                Tables\Columns\TextColumn::make('cohort.generation')
                     ->label('期')
                     ->formatStateUsing(fn ($state) => $state ? "{$state}期" : '-')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('university_year')
-                    ->label('学年')
-                    ->formatStateUsing(fn ($state) => $state ? "{$state}年" : '-'),
-
-                Tables\Columns\TextColumn::make('status')
-                    ->label('ステータス')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'ob_og'  => 'gray',
-                        default  => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => '現役',
-                        'ob_og'  => 'OB/OG',
-                        default  => $state,
-                    }),
+                Tables\Columns\TextColumn::make('position')
+                    ->label('役職')
+                    ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('order_index')
                     ->label('表示順')
@@ -153,12 +102,10 @@ class MemberResource extends Resource
             ])
             ->defaultSort('order_index')
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('ステータス')
-                    ->options([
-                        'active' => '現役',
-                        'ob_og'  => 'OB/OG',
-                    ]),
+                Tables\Filters\SelectFilter::make('cohort_id')
+                    ->label('期')
+                    ->relationship('cohort', 'generation')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->generation}期"),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

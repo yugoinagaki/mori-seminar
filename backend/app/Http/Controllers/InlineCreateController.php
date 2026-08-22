@@ -61,23 +61,17 @@ class InlineCreateController extends Controller
     public function member(Request $request)
     {
         $validated = $request->validate([
-            'name'            => ['required', 'string', 'max:100'],
-            'name_kana'       => ['nullable', 'string', 'max:100'],
-            'generation'      => ['nullable', 'integer'],
-            'university_year' => ['nullable', 'string', 'max:10'],
-            'major'           => ['nullable', 'string', 'max:200'],
-            'bio'             => ['nullable', 'string'],
-            'status'          => ['required', 'in:active,alumni'],
+            'name'      => ['required', 'string', 'max:100'],
+            'cohort_id' => ['nullable', 'integer', 'exists:cohorts,id'],
+            'position'  => ['nullable', 'string', 'max:100'],
+            'bio'       => ['nullable', 'string'],
         ]);
 
         Member::create([
-            'name'            => strip_tags($validated['name']),
-            'name_kana'       => isset($validated['name_kana']) ? strip_tags($validated['name_kana']) : null,
-            'generation'      => $validated['generation'] ?? null,
-            'university_year' => isset($validated['university_year']) ? strip_tags($validated['university_year']) : null,
-            'major'           => isset($validated['major']) ? strip_tags($validated['major']) : null,
-            'bio'             => isset($validated['bio']) ? HtmlFields::sanitize('member', 'bio', $validated['bio']) : null,
-            'status'          => $validated['status'],
+            'name'      => strip_tags($validated['name']),
+            'cohort_id' => $validated['cohort_id'] ?? null,
+            'position'  => isset($validated['position']) ? strip_tags($validated['position']) : null,
+            'bio'       => isset($validated['bio']) ? HtmlFields::sanitize('member', 'bio', $validated['bio']) : null,
         ]);
 
         return redirect('/members');

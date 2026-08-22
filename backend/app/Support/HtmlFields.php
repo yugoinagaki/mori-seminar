@@ -27,10 +27,9 @@ class HtmlFields
             'content'     => 'default',
         ],
         'member' => [
-            'name'      => null,
-            'name_kana' => null,
-            'major'     => null,
-            'bio'       => 'basic',
+            'name'     => null,
+            'position' => null,
+            'bio'      => 'basic',
         ],
         'faq' => [
             'question' => null,

@@ -224,5 +224,32 @@
     animation: kb-zoom-in 6s ease forwards;
 }
 
+/* ── Members marquee (home page) ────────────────────────────────────────────── */
+@keyframes members-marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+.members-marquee {
+    display: flex;
+    width: max-content;
+    animation: members-marquee var(--marquee-duration, 60s) linear infinite;
+    will-change: transform;
+}
+
+.members-marquee-viewport:hover .members-marquee {
+    animation-play-state: paused;
+}
+
+.members-marquee-viewport {
+    /* Fade in/out at the edges */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .members-marquee { animation: none; }
+}
+
 /* Dynamic type badge classes — must appear in source for Tailwind to include them */
 /* bg-primary-700 text-white bg-emerald-700 text-white bg-amber-600 text-white bg-rose-700 text-white bg-gray-200 text-gray-600 */

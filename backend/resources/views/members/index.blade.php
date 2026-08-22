@@ -15,111 +15,130 @@
 
     {{-- Tabs --}}
     <div class="bg-white border-b border-gray-100 sticky top-[60px] z-40">
-        <div class="max-w-7xl mx-auto px-6 md:px-14 flex gap-0">
-            <button id="tab-btn-active"
-                    class="members-tab-btn px-6 py-4 text-sm font-medium border-b-2 transition-colors border-primary-700 text-primary-700"
-                    data-tab="active">
-                現役メンバー
+        <div class="max-w-7xl mx-auto px-6 md:px-14 flex gap-0 overflow-x-auto">
+            <button type="button"
+                    class="members-tab-btn px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap border-primary-700 text-primary-700"
+                    data-tab="all">
+                全員
             </button>
-            <button id="tab-btn-alumni"
-                    class="members-tab-btn px-6 py-4 text-sm font-medium border-b-2 transition-colors border-transparent text-gray-400 hover:text-gray-700"
-                    data-tab="alumni">
-                OB・OG
+            @foreach($cohorts as $cohort)
+            <button type="button"
+                    class="members-tab-btn px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap border-transparent text-gray-400 hover:text-gray-700"
+                    data-tab="cohort-{{ $cohort->id }}">
+                {{ $cohort->generation }}期
             </button>
+            @endforeach
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
-
-        {{-- Active --}}
-        <div id="tab-active">
-            @if($activeMembers->isNotEmpty())
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                @foreach($activeMembers as $member)
-                <div class="fade-in group">
-                    <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
-                        @if($member->profile_image_url)
-                        <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
-                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
-                        @else
-                        <div class="w-full h-full bg-primary-50 flex items-center justify-center">
-                            <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
-                        </div>
-                        @endif
+        @if($members->isNotEmpty())
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            @foreach($members as $member)
+            <div class="fade-in group"
+                 data-member-cohort="{{ $member->cohort_id ? 'cohort-' . $member->cohort_id : '' }}">
+                <button type="button"
+                        class="member-photo-trigger relative block w-full aspect-square overflow-hidden mb-3 bg-gray-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                        data-open-member-modal
+                        data-name="{{ $member->name }}"
+                        data-cohort="{{ $member->cohort?->generation }}"
+                        data-position="{{ $member->position }}"
+                        data-image-url="{{ $member->profile_image_url ? storage_url($member->profile_image_url) : '' }}"
+                        data-initial="{{ mb_substr($member->name, 0, 1) }}"
+                        aria-label="{{ $member->name }} の詳細を見る">
+                    @if($member->profile_image_url)
+                    <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
+                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
+                    @else
+                    <div class="w-full h-full bg-primary-50 flex items-center justify-center">
+                        <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
                     </div>
-                    <p class="text-sm font-bold text-gray-800"
-                       data-editable data-model="member" data-id="{{ $member->id }}" data-field="name">
-                        {{ $member->name }}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-0.5">
-                        {{ $member->generation ? $member->generation . '期' : '' }}{{ $member->university_year ? '・' . $member->university_year . '年' : '' }}
-                    </p>
-                    @if($member->major)
-                    <p class="text-xs text-gray-400"
-                       data-editable data-model="member" data-id="{{ $member->id }}" data-field="major">
-                        {{ $member->major }}
-                    </p>
                     @endif
-                    @if($member->bio)
-                    <p class="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-3"
-                       data-editable data-model="member" data-id="{{ $member->id }}" data-field="bio">
-                        {{ strip_tags($member->bio) }}
-                    </p>
-                    @endif
-                    <div class="flex gap-3 mt-2">
-                        @if($member->twitter_url)
-                        <a href="{{ $member->twitter_url }}" target="_blank" rel="noopener" class="text-gray-300 hover:text-primary-700 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                        </a>
-                        @endif
-                        @if($member->instagram_url)
-                        <a href="{{ $member->instagram_url }}" target="_blank" rel="noopener" class="text-gray-300 hover:text-primary-700 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                            </svg>
-                        </a>
-                        @endif
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary-950/25 pointer-events-none">
+                        <span class="text-white text-[10px] tracking-[0.3em] uppercase font-medium px-3 py-1.5 border border-white/70 backdrop-blur-sm">View</span>
                     </div>
-                </div>
-                @endforeach
+                    {{-- Bio HTML held here so JS can copy it into the modal --}}
+                    <template class="member-bio-template">{!! $member->bio !!}</template>
+                </button>
+                <p class="text-sm font-bold text-gray-800"
+                   data-editable data-model="member" data-id="{{ $member->id }}" data-field="name">
+                    {{ $member->name }}
+                </p>
+                @if($member->cohort?->generation)
+                <p class="text-xs text-gray-400 mt-0.5">
+                    {{ $member->cohort->generation }}期
+                </p>
+                @endif
+                @if($member->position)
+                <p class="text-xs text-gray-500 mt-0.5"
+                   data-editable data-model="member" data-id="{{ $member->id }}" data-field="position">
+                    {{ $member->position }}
+                </p>
+                @endif
+                @if($member->bio)
+                <p class="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-3"
+                   data-editable data-model="member" data-id="{{ $member->id }}" data-field="bio">
+                    {{ strip_tags($member->bio) }}
+                </p>
+                @endif
             </div>
-            @else
-            <p class="py-16 text-center text-gray-400">メンバーが登録されていません</p>
-            @endif
+            @endforeach
         </div>
+        @else
+        <p class="py-16 text-center text-gray-400">メンバーが登録されていません</p>
+        @endif
+    </div>
+</div>
 
-        {{-- Alumni --}}
-        <div id="tab-alumni" class="hidden">
-            @if($alumniMembers->isNotEmpty())
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                @foreach($alumniMembers as $member)
-                <div class="fade-in group">
-                    <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
-                        @if($member->profile_image_url)
-                        <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
-                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
-                        @else
-                        <div class="w-full h-full bg-primary-50 flex items-center justify-center">
-                            <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
-                        </div>
-                        @endif
+{{-- Member detail modal --}}
+<div id="member-modal" class="hidden fixed inset-0 z-[80]" aria-hidden="true" role="dialog" aria-modal="true">
+    <div id="member-modal-overlay"
+         class="absolute inset-0 bg-primary-950/85 backdrop-blur-md opacity-0 transition-opacity duration-300"></div>
+
+    <div class="absolute inset-0 flex items-center justify-center p-4 md:p-8 pointer-events-none">
+        <div id="member-modal-panel"
+             class="relative w-full max-w-4xl h-[90vh] md:h-[85vh] md:max-h-[680px] bg-white overflow-hidden flex flex-col opacity-0 translate-y-6 scale-[0.98] transition-all duration-500 ease-out pointer-events-auto"
+             style="box-shadow: 0 30px 90px -20px rgba(4, 28, 51, 0.55), 0 8px 30px -10px rgba(4, 28, 51, 0.35);">
+            <button type="button" id="member-modal-close"
+                    class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/40 hover:bg-black/70 backdrop-blur-sm rounded-full transition-all"
+                    aria-label="閉じる">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="flex flex-col md:flex-row flex-1 min-h-0">
+                {{-- Photo (fixed size, doesn't stretch with bio) --}}
+                <div class="relative aspect-square md:aspect-auto md:h-full md:w-3/5 bg-primary-950 overflow-hidden shrink-0">
+                    <img id="member-modal-image" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
+                    <div id="member-modal-initial" class="absolute inset-0 hidden items-center justify-center bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950">
+                        <span class="text-white/25 text-[10rem] font-bold font-mincho leading-none"></span>
                     </div>
-                    <p class="text-sm font-bold text-gray-800">{{ $member->name }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">
-                        {{ $member->generation ? $member->generation . '期' : '' }}
-                        {{ $member->graduated_year ? '(' . $member->graduated_year . '年卒)' : '' }}
-                    </p>
-                    @if($member->major)
-                    <p class="text-xs text-gray-400">{{ $member->major }}</p>
-                    @endif
+                    <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-primary-950/80 to-transparent"></div>
+                    <p class="absolute bottom-5 left-6 text-white/50 text-[9px] tracking-[0.4em] uppercase">Mori Seminar</p>
                 </div>
-                @endforeach
+
+                {{-- Text (scrolls independently) --}}
+                <div class="relative flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden">
+                    <div class="flex-1 min-h-0 overflow-y-auto p-8 md:p-10 member-modal-scroll">
+                        <p class="text-[10px] tracking-[0.4em] uppercase text-primary-700 font-semibold mb-4">Member</p>
+                        <h2 id="member-modal-name" class="text-3xl md:text-[2.15rem] font-bold text-gray-900 font-mincho tracking-wide mb-5 leading-tight break-words"></h2>
+
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <span id="member-modal-cohort"
+                                  class="hidden text-[11px] px-3 py-1 border border-primary-700 text-primary-700 tracking-wider font-medium"></span>
+                            <span id="member-modal-position"
+                                  class="hidden text-[11px] px-3 py-1 bg-primary-900 text-white tracking-wider font-medium"></span>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6">
+                            <p class="text-[10px] tracking-[0.35em] uppercase text-gray-400 mb-4">About</p>
+                            <div id="member-modal-bio" class="text-[13.5px] text-gray-700 leading-loose whitespace-pre-line break-words"></div>
+                            <p id="member-modal-bio-empty" class="hidden text-sm text-gray-300 italic">自己紹介は登録されていません</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            @else
-            <p class="py-16 text-center text-gray-400">OB/OGが登録されていません</p>
-            @endif
         </div>
     </div>
 </div>

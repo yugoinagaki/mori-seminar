@@ -89,43 +89,32 @@
             </form>
 
             {{-- Member form --}}
+            @php $modalCohorts = \App\Models\Cohort::orderBy('generation', 'desc')->get(); @endphp
             <form id="form-member" method="POST" action="{{ route('create.member') }}" class="hidden">
                 @csrf
                 <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">氏名 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="name" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="山田 太郎">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">よみがな</label>
-                            <input type="text" name="name_kana" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="やまだ たろう">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">氏名 <span class="text-rose-500">*</span></label>
+                        <input type="text" name="name" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="山田 太郎">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">期</label>
-                            <input type="number" name="generation" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="1">
+                            <select name="cohort_id" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">未分類</option>
+                                @foreach($modalCohorts as $c)
+                                <option value="{{ $c->id }}">{{ $c->generation }}期</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">学年</label>
-                            <input type="text" name="university_year" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="3年">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">役職</label>
+                            <input type="text" name="position" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="代表">
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">専攻</label>
-                        <input type="text" name="major" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="商学部 マーケティング学科">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">自己紹介</label>
                         <textarea name="bio" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none" placeholder="（省略可）"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">ステータス <span class="text-rose-500">*</span></label>
-                        <select name="status" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option value="active">在籍中</option>
-                            <option value="alumni">OB/OG</option>
-                        </select>
                     </div>
                 </div>
                 <div class="mt-5 flex justify-end gap-2">

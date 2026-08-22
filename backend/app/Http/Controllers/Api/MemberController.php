@@ -10,12 +10,10 @@ class MemberController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Member::orderBy('order_index')->orderBy('generation', 'desc');
+        $members = Member::with('cohort')
+            ->orderBy('order_index')
+            ->get();
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        return response()->json($query->get());
+        return response()->json($members);
     }
 }
