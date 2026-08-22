@@ -126,6 +126,8 @@
                                 <div class="aspect-[2/3] overflow-hidden bg-gray-100 mb-3 shadow-sm">
                                     <img src="{{ storage_url($cover) }}"
                                          alt="{{ $book['title'] ?? '' }}"
+                                         loading="lazy"
+                                         decoding="async"
                                          class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300">
                                 </div>
                             </a>

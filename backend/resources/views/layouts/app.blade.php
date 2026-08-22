@@ -18,15 +18,13 @@
             ->values()
             ->all();
         if (empty($transitionImages)) {
-            $transitionImages = [asset('forest.png')];
+            $transitionImages = [asset('forest.jpg')];
         }
         $wipeImage = $transitionImages[array_rand($transitionImages)];
     @endphp
 
-    {{-- Preload all transition images so whichever the JS picks is already cached --}}
-    @foreach($transitionImages as $img)
-    <link rel="preload" as="image" href="{{ $img }}">
-    @endforeach
+    {{-- Preload only the image actually selected for this page load --}}
+    <link rel="preload" as="image" href="{{ $wipeImage }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

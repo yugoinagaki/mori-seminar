@@ -21,6 +21,7 @@
                 <div class="aspect-video bg-primary-50 overflow-hidden mb-4">
                     @if($post->thumbnail_url)
                     <img src="{{ storage_url($post->thumbnail_url) }}" alt="{{ $post->title }}"
+                         loading="lazy" decoding="async"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
                     <div class="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">

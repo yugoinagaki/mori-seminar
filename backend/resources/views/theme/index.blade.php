@@ -32,6 +32,7 @@
     <div class="fade-in relative w-full overflow-hidden" style="height: 70vh; min-height: 380px; max-height: 680px">
         <img src="{{ asset('storage/' . $theme->photo_url) }}"
              alt="{{ $theme->year }}年 森聡ゼミ 集合写真"
+             loading="lazy" decoding="async"
              class="w-full h-full object-cover object-center">
         {{-- top fade to blend with hero --}}
         <div class="absolute inset-x-0 top-0 h-16 pointer-events-none"
