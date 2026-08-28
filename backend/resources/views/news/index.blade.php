@@ -38,17 +38,22 @@
         <ul class="divide-y divide-gray-100">
             @forelse($posts as $item)
             <li>
-                <a href="/news/{{ $item->slug }}" class="flex flex-col sm:flex-row sm:items-center gap-3 py-5 group" data-wipe-link>
-                    <time class="text-gray-400 text-sm font-mono w-28 shrink-0">
+                <a href="/news/{{ $item->slug }}"
+                   class="relative flex flex-col sm:flex-row sm:items-center gap-3 py-5 px-4 sm:px-6 -mx-4 sm:-mx-6 group overflow-hidden" data-wipe-link>
+                    {{-- Ink fill layer --}}
+                    <span aria-hidden="true"
+                          class="absolute inset-0 bg-primary-700 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out motion-reduce:transition-none motion-reduce:translate-x-0 motion-reduce:opacity-0 motion-reduce:group-hover:opacity-100"></span>
+
+                    <time class="relative z-10 text-gray-400 group-hover:text-white/70 text-sm font-mono w-28 shrink-0 transition-colors duration-300 delay-100">
                         {{ $item->published_at?->format('Y.m.d') }}
                     </time>
-                    <span class="text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }}">
+                    <span class="relative z-10 text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 border border-transparent transition-all duration-300 delay-100 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }} group-hover:!bg-transparent group-hover:!text-white group-hover:border-white/60">
                         {{ $typeLabel[$item->type] ?? $item->type }}
                     </span>
-                    <span class="flex-1 text-gray-700 text-sm md:text-[15px] font-medium group-hover:text-primary-700 transition-colors">
+                    <span class="relative z-10 flex-1 text-gray-700 group-hover:text-white text-sm md:text-[15px] font-medium transition-colors duration-300 delay-100">
                         {{ $item->title }}
                     </span>
-                    <svg class="w-4 h-4 text-gray-300 group-hover:text-primary-700 group-hover:translate-x-1 transition-all shrink-0 hidden sm:block"
+                    <svg class="relative z-10 w-4 h-4 text-gray-300 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 delay-100 shrink-0 hidden sm:block"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
                     </svg>

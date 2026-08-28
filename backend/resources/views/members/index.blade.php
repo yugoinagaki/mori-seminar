@@ -38,7 +38,7 @@
             <div class="fade-in group"
                  data-member-cohort="{{ $member->cohort_id ? 'cohort-' . $member->cohort_id : '' }}">
                 <button type="button"
-                        class="member-photo-trigger relative block w-full aspect-square overflow-hidden mb-3 bg-gray-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                        class="member-photo-trigger relative block w-full mb-4 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
                         data-open-member-modal
                         data-name="{{ $member->name }}"
                         data-cohort="{{ $member->cohort?->generation }}"
@@ -46,37 +46,35 @@
                         data-image-url="{{ $member->profile_image_url ? storage_url($member->profile_image_url) : '' }}"
                         data-initial="{{ mb_substr($member->name, 0, 1) }}"
                         aria-label="{{ $member->name }} の詳細を見る">
-                    @if($member->profile_image_url)
-                    <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
-                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
-                    @else
-                    <div class="w-full h-full bg-primary-50 flex items-center justify-center">
-                        <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
-                    </div>
-                    @endif
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary-950/25 pointer-events-none">
-                        <span class="text-white text-[10px] tracking-[0.3em] uppercase font-medium px-3 py-1.5 border border-white/70 backdrop-blur-sm">View</span>
+                    <div class="p-3 bg-primary-950 border-2 border-primary-800 group-hover:border-amber-400 shadow-md group-hover:shadow-xl transition-all duration-500">
+                        <div class="aspect-square overflow-hidden bg-gray-100">
+                            @if($member->profile_image_url)
+                            <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
+                            @else
+                            <div class="w-full h-full bg-primary-50 flex items-center justify-center">
+                                <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                     {{-- Bio HTML held here so JS can copy it into the modal --}}
                     <template class="member-bio-template">{!! $member->bio !!}</template>
                 </button>
-                <p class="text-sm font-bold text-gray-800"
+
+                @if($member->cohort?->generation || $member->position)
+                <p class="text-center text-[10px] tracking-[0.3em] uppercase text-primary-700/80 font-medium mb-1.5">
+                    {{ $member->cohort?->generation ? $member->cohort->generation . '期' : '' }}{{ $member->position ? ($member->cohort?->generation ? ' · ' : '') . $member->position : '' }}
+                </p>
+                @endif
+
+                <p class="text-center font-mincho text-base md:text-lg font-bold text-gray-900 tracking-wide leading-tight group-hover:text-primary-700 transition-colors duration-300"
                    data-editable data-model="member" data-id="{{ $member->id }}" data-field="name">
                     {{ $member->name }}
                 </p>
-                @if($member->cohort?->generation)
-                <p class="text-xs text-gray-400 mt-0.5">
-                    {{ $member->cohort->generation }}期
-                </p>
-                @endif
-                @if($member->position)
-                <p class="text-xs text-gray-500 mt-0.5"
-                   data-editable data-model="member" data-id="{{ $member->id }}" data-field="position">
-                    {{ $member->position }}
-                </p>
-                @endif
+
                 @if($member->bio)
-                <p class="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-3"
+                <p class="text-xs text-gray-500 mt-3 leading-relaxed line-clamp-3"
                    data-editable data-model="member" data-id="{{ $member->id }}" data-field="bio">
                     {{ strip_tags($member->bio) }}
                 </p>
@@ -97,7 +95,7 @@
 
     <div class="absolute inset-0 flex items-center justify-center p-4 md:p-8 pointer-events-none">
         <div id="member-modal-panel"
-             class="relative w-full max-w-4xl h-[90vh] md:h-[85vh] md:max-h-[680px] bg-white overflow-hidden flex flex-col opacity-0 translate-y-6 scale-[0.98] transition-all duration-500 ease-out pointer-events-auto"
+             class="relative w-full max-w-4xl h-[90vh] md:h-[85vh] md:max-h-[680px] bg-white overflow-hidden flex flex-col opacity-0 translate-y-6 scale-[0.98] transition-all duration-500 ease-out pointer-events-auto border-[6px] md:border-[10px] border-primary-950"
              style="box-shadow: 0 30px 90px -20px rgba(4, 28, 51, 0.55), 0 8px 30px -10px rgba(4, 28, 51, 0.35);">
             <button type="button" id="member-modal-close"
                     class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/40 hover:bg-black/70 backdrop-blur-sm rounded-full transition-all"
@@ -108,8 +106,8 @@
             </button>
 
             <div class="flex flex-col md:flex-row flex-1 min-h-0">
-                {{-- Photo (fixed size, doesn't stretch with bio) --}}
-                <div class="relative aspect-square md:aspect-auto md:h-full md:w-3/5 bg-primary-950 overflow-hidden shrink-0">
+                {{-- Framed photo (amber border at modal edge, no mat) --}}
+                <div class="relative aspect-square md:aspect-auto md:h-full md:w-3/5 bg-primary-950 overflow-hidden shrink-0 border-b-2 md:border-b-0 md:border-r-2 border-amber-400">
                     <img id="member-modal-image" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
                     <div id="member-modal-initial" class="absolute inset-0 hidden items-center justify-center bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950">
                         <span class="text-white/25 text-[10rem] font-bold font-mincho leading-none"></span>

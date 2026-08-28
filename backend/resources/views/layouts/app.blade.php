@@ -30,6 +30,28 @@
 </head>
 <body class="text-gray-900 bg-white">
 
+    {{-- Intro splash (first visit in a session) --}}
+    <script>
+        try {
+            if (sessionStorage.getItem('intro-splash-seen')) {
+                document.documentElement.classList.add('intro-seen');
+            }
+        } catch (e) {}
+    </script>
+    <div id="intro-splash" class="fixed inset-0 z-[100] overflow-hidden">
+        {{-- Top curtain --}}
+        <div id="intro-top"
+             class="absolute inset-x-0 top-0 h-1/2 bg-primary-950 transition-transform duration-[1000ms] ease-[cubic-bezier(0.77,0,0.175,1)]"></div>
+        {{-- Bottom curtain --}}
+        <div id="intro-bottom"
+             class="absolute inset-x-0 bottom-0 h-1/2 bg-primary-950 transition-transform duration-[1000ms] ease-[cubic-bezier(0.77,0,0.175,1)]"></div>
+        {{-- Logo (above both curtains) --}}
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img id="intro-logo" src="/seminar-logo.png" alt="森聡研究会"
+                 class="w-48 md:w-64 h-auto opacity-0 scale-95 transition-all duration-700 ease-out">
+        </div>
+    </div>
+
     {{-- Page transition wipe overlay --}}
     @if($showWipe ?? false)
         <div id="wipe-overlay" class="wipe-wrapper">

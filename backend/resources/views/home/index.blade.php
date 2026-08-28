@@ -27,14 +27,17 @@
          style="background: linear-gradient(to bottom, transparent, rgba(4,28,51,0.7))"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-28">
-        <div class="text-center md:text-left">
-            <h1 class="text-white font-bold mb-6 leading-none"
+        <div class="text-center">
+            <h1 class="text-white font-bold mb-6 leading-none relative"
                 id="hero-title"
-                style="font-size: clamp(2.8rem, 8vw, 6rem); letter-spacing: 0.1em; opacity: 0">
+                style="font-size: clamp(1.5rem, 8vw, 6rem); letter-spacing: 0.08em">
+                <span id="hero-en" class="block whitespace-nowrap opacity-0"></span>
+                <span id="hero-jp" class="absolute inset-0 flex items-center justify-center font-mincho opacity-0"
+                      style="letter-spacing: 0.12em">森聡研究会</span>
             </h1>
 
             <div id="hero-buttons"
-                 class="flex flex-wrap justify-center md:justify-start gap-4"
+                 class="flex flex-wrap justify-center gap-4"
                  style="opacity: 0; transform: translateY(10px)">
                 <a href="/theme" class="btn-outline-white" data-wipe-link>
                     研究テーマについて
@@ -54,8 +57,9 @@
 
     {{-- 右上ニュースカード（デスクトップのみ） --}}
     @if(count($worldNews) > 0)
-    <div class="hidden lg:block fixed top-28 right-4 w-64 z-40 hero-sub" style="animation-delay: 2.6s"
-         id="news-widget">
+    <div class="hidden lg:block fixed top-28 right-4 w-64 z-40"
+         id="news-widget"
+         style="opacity: 0; transform: translateY(10px)">
         <div id="news-widget-header" class="flex justify-end mb-1">
             <button id="news-widget-close"
                     class="flex items-center justify-center w-5 h-5 rounded-full bg-primary-900/80 hover:bg-primary-700 text-white/80 hover:text-white transition-all border border-white/20"
@@ -136,7 +140,7 @@
 
 {{-- ANNUAL THEME --}}
 @if($theme)
-@php $slideshowPhotos = array_values(array_filter((array)($theme->slideshow_photo_urls ?? []))); @endphp
+@php $slideshowPhotos = array_values(array_filter((array)($themeYear->slideshow_photo_urls ?? []))); @endphp
 <section class="py-28 relative overflow-hidden"
          style="background: linear-gradient(140deg, #0d5189 0%, #1a79c0 100%)">
     {{-- decorative circles (only when no slideshow) --}}
@@ -227,17 +231,21 @@
             @forelse($recentPosts as $item)
             <li class="fade-in">
                 <a href="{{ $item->type === 'blog' ? '/blog/' : '/news/' }}{{ $item->slug }}"
-                   class="flex flex-col sm:flex-row sm:items-center gap-3 py-5 group" data-wipe-link>
-                    <time class="text-gray-400 text-sm font-mono w-28 shrink-0">
+                   class="relative flex flex-col sm:flex-row sm:items-center gap-3 py-5 px-4 sm:px-6 -mx-4 sm:-mx-6 group overflow-hidden" data-wipe-link>
+                    {{-- Ink fill layer --}}
+                    <span aria-hidden="true"
+                          class="absolute inset-0 bg-primary-700 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out motion-reduce:transition-none motion-reduce:translate-x-0 motion-reduce:opacity-0 motion-reduce:group-hover:opacity-100"></span>
+
+                    <time class="relative z-10 text-gray-400 group-hover:text-white/70 text-sm font-mono w-28 shrink-0 transition-colors duration-300 delay-100">
                         {{ $item->published_at?->format('Y.m.d') }}
                     </time>
-                    <span class="text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }}">
+                    <span class="relative z-10 text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 border border-transparent transition-all duration-300 delay-100 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }} group-hover:!bg-transparent group-hover:!text-white group-hover:border-white/60">
                         {{ $typeLabel[$item->type] ?? $item->type }}
                     </span>
-                    <span class="flex-1 text-gray-700 text-sm md:text-[15px] font-medium group-hover:text-primary-700 transition-colors">
+                    <span class="relative z-10 flex-1 text-gray-700 group-hover:text-white text-sm md:text-[15px] font-medium transition-colors duration-300 delay-100">
                         {{ $item->title }}
                     </span>
-                    <svg class="w-4 h-4 text-gray-300 group-hover:text-primary-700 group-hover:translate-x-1 transition-all shrink-0 hidden sm:block"
+                    <svg class="relative z-10 w-4 h-4 text-gray-300 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 delay-100 shrink-0 hidden sm:block"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
                     </svg>
@@ -331,19 +339,25 @@
                        data-wipe-link
                        aria-hidden="{{ $pass === 2 ? 'true' : 'false' }}"
                        tabindex="{{ $pass === 2 ? '-1' : '0' }}">
-                        <div class="aspect-square overflow-hidden mb-3 bg-gray-100">
-                            @if($member->profile_image_url)
-                            <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
-                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
-                            @else
-                            <div class="w-full h-full bg-primary-100 flex items-center justify-center">
-                                <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
+                        <div class="p-2 bg-primary-950 border-2 border-primary-800 group-hover:border-amber-400 shadow-md group-hover:shadow-xl mb-4 transition-all duration-500">
+                            <div class="aspect-square overflow-hidden bg-gray-100">
+                                @if($member->profile_image_url)
+                                <img src="{{ storage_url($member->profile_image_url) }}" alt="{{ $member->name }}"
+                                     class="w-full h-full object-cover grayscale group-hover:grayscale-0 scale-[1.04] group-hover:scale-100 transition-all duration-500">
+                                @else
+                                <div class="w-full h-full bg-primary-100 flex items-center justify-center">
+                                    <span class="text-primary-300 text-3xl font-bold">{{ mb_substr($member->name, 0, 1) }}</span>
+                                </div>
+                                @endif
                             </div>
-                            @endif
                         </div>
-                        <p class="text-sm font-medium text-gray-800">{{ $member->name }}</p>
-                        <p class="text-xs text-gray-400 mt-0.5">
-                            {{ $member->cohort?->generation ? $member->cohort->generation . '期' : '' }}{{ $member->position ? ($member->cohort?->generation ? '・' : '') . $member->position : '' }}
+                        @if($member->cohort?->generation || $member->position)
+                        <p class="text-center text-[10px] tracking-[0.3em] uppercase text-primary-700/80 font-medium mb-1.5">
+                            {{ $member->cohort?->generation ? $member->cohort->generation . '期' : '' }}{{ $member->position ? ($member->cohort?->generation ? ' · ' : '') . $member->position : '' }}
+                        </p>
+                        @endif
+                        <p class="text-center font-mincho text-base md:text-lg font-bold text-gray-900 tracking-wide leading-tight">
+                            {{ $member->name }}
                         </p>
                     </a>
                     @endforeach

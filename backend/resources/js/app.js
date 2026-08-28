@@ -307,6 +307,45 @@ function initMemberModal() {
     });
 }
 
+// ─── G3. Intro splash (first visit in a session, curtain reveal) ─────────────
+function initIntroSplash() {
+    const splash = document.getElementById('intro-splash');
+    if (!splash) return;
+
+    // If html has .intro-seen (inline-script set it), just remove the node
+    if (document.documentElement.classList.contains('intro-seen')) {
+        splash.remove();
+        return;
+    }
+
+    try { sessionStorage.setItem('intro-splash-seen', '1'); } catch (e) {}
+
+    const top    = document.getElementById('intro-top');
+    const bottom = document.getElementById('intro-bottom');
+    const logo   = document.getElementById('intro-logo');
+
+    // Phase 1: logo fades + scales in
+    requestAnimationFrame(() => {
+        if (logo) {
+            logo.classList.remove('opacity-0', 'scale-95');
+            logo.classList.add('opacity-100', 'scale-100');
+        }
+    });
+
+    // Phase 2: curtains split apart + logo fades out
+    setTimeout(() => {
+        if (top)    top.style.transform    = 'translateY(-100%)';
+        if (bottom) bottom.style.transform = 'translateY(100%)';
+        if (logo) {
+            logo.style.transition = 'opacity 0.45s ease-out';
+            logo.style.opacity    = '0';
+        }
+    }, 1400);
+
+    // Phase 3: remove after curtains have fully left the viewport
+    setTimeout(() => splash.remove(), 2500);
+}
+
 // ─── FAQ accordion ────────────────────────────────────────────────────────────
 function initFaq() {
     let openId = null;
@@ -340,6 +379,7 @@ function initNewsCard() {
     const articles = window.__worldNews;
     if (!Array.isArray(articles) || !articles.length) return;
 
+    const widget      = document.getElementById('news-widget');
     const header      = document.getElementById('news-widget-header');
     const cardLink    = document.getElementById('news-card-container');
     const closeBtn    = document.getElementById('news-widget-close');
@@ -351,6 +391,20 @@ function initNewsCard() {
     const dotsContainer = document.getElementById('news-dots');
 
     if (!cardLink) return;
+
+    // Reveal the widget after intro/hero animation completes. If splash is playing
+    // this is later (post-curtain + hero-title done); otherwise, matches the
+    // previous hero-sub timing (~2.6s from load).
+    const splashPlaying = document.getElementById('intro-splash')
+        && !document.documentElement.classList.contains('intro-seen');
+    const revealDelay = splashPlaying ? (window.__heroAnimEnd ?? 5400) : 2600;
+    if (widget) {
+        setTimeout(() => {
+            widget.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            widget.style.opacity    = '1';
+            widget.style.transform  = 'translateY(0)';
+        }, revealDelay);
+    }
 
     const INTERVAL = 7000;
     let currentIndex = 0;
@@ -758,73 +812,68 @@ function initHomeSlideshow() {
     startTimer();
 }
 
-// ─── J. Hero title morph (EN words sequential → slide-out → JA char-by-char) ─
+// ─── J. Hero title: English words fade in → crossfade to Japanese ────────────
 function initMorphTitle() {
-    const h1   = document.getElementById('hero-title');
-    const btns = document.getElementById('hero-buttons');
-    if (!h1) return;
+    const h1     = document.getElementById('hero-title');
+    const enWrap = document.getElementById('hero-en');
+    const jpWrap = document.getElementById('hero-jp');
+    const btns   = document.getElementById('hero-buttons');
+    if (!h1 || !enWrap || !jpWrap) return;
 
-    const mobile = window.matchMedia('(max-width: 767px)').matches;
-
-    // Step 1: Place all words in DOM immediately (invisible) so layout is fixed,
-    // then fade each in one by one at its final resting position
-    const wordSpans = ['MORI', 'SATORU', 'SEMINAR'].map((word, i) => {
-        if (i > 0) h1.appendChild(document.createTextNode(' '));
+    // Fill English container with a span per word so we can stagger fades.
+    // Insert a mobile-only <br> before "SEMINAR" so mobile shows two lines:
+    //   MORI SATORU
+    //   SEMINAR
+    const words = ['MORI', 'SATORU', 'SEMINAR'];
+    enWrap.innerHTML = '';
+    const wordSpans = words.map((word, i) => {
+        if (i > 0) {
+            // Always add a space so desktop keeps proper word separation
+            enWrap.appendChild(document.createTextNode(' '));
+            // Before "SEMINAR", also add a mobile-only line break
+            if (word === 'SEMINAR') {
+                const br = document.createElement('br');
+                br.className = 'md:hidden';
+                enWrap.appendChild(br);
+            }
+        }
         const span = document.createElement('span');
-        span.style.cssText = 'opacity:0; display:inline-block; transition:opacity 0.5s ease';
+        span.style.cssText = 'opacity:0; display:inline-block; transition:opacity 0.7s ease';
         span.textContent = word;
-        h1.appendChild(span);
+        enWrap.appendChild(span);
         return span;
     });
-    h1.style.opacity = '1';
+    enWrap.style.opacity = '1'; // container visible; children fade in one by one
 
+    // If intro splash is running (first visit), wait until curtains have fully
+    // retracted so the hero animation plays on a clean stage.
+    const splashPlaying = document.getElementById('intro-splash')
+        && !document.documentElement.classList.contains('intro-seen');
+    const START = splashPlaying ? 2400 : 0;
+
+    // Step 1: stagger fade-in each English word (slower, more editorial pace)
     wordSpans.forEach((span, i) => {
-        setTimeout(() => { span.style.opacity = '1'; }, 200 + i * 480);
+        setTimeout(() => { span.style.opacity = '1'; }, START + 200 + i * 350);
     });
 
-    // Step 2: Slide h1 out (left on desktop, up on mobile)
+    // Step 2: crossfade English → Japanese in place (no scale, no slide)
     setTimeout(() => {
-        h1.style.transition = 'opacity 0.45s ease-in, transform 0.45s ease-in';
-        h1.style.opacity    = '0';
-        if (mobile) {
-            // モバイル: 中央のままスケールアップのみ
-            h1.style.transform = 'scale(2.4)';
-        } else {
-            // デスクトップ: 文字中心をビューポート中央に向けてスライド＋スケール
-            const spans      = h1.querySelectorAll('span');
-            const first      = spans[0]?.getBoundingClientRect();
-            const last       = spans[spans.length - 1]?.getBoundingClientRect();
-            const textCenter = first && last ? (first.left + last.right) / 2 : window.innerWidth / 2;
-            const offsetX    = Math.round(window.innerWidth / 2 - textCenter + window.innerWidth * 0.2);
-            h1.style.transform = `translateX(${offsetX}px) scale(2.4)`;
-        }
+        enWrap.style.transition = 'opacity 1s ease';
+        jpWrap.style.transition = 'opacity 1s ease';
+        enWrap.style.opacity    = '0';
+        jpWrap.style.opacity    = '1';
+    }, START + 2000);
 
-        // Step 3: Replace with Japanese chars, one by one (hero-char style)
-        setTimeout(() => {
-            h1.style.transition    = 'none';
-            h1.style.transform     = 'none';
-            h1.style.opacity       = '1';
-            h1.innerHTML           = '';
-            h1.classList.add('font-mincho');
-            h1.style.letterSpacing = '0.12em';
+    // Step 3: reveal buttons during the last part of the crossfade
+    setTimeout(() => {
+        if (!btns) return;
+        btns.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        btns.style.transform  = 'translateY(0)';
+        btns.style.opacity    = '1';
+    }, START + 2700);
 
-            ['森', '聡', '研', '究', '会'].forEach((char, i) => {
-                const span = document.createElement('span');
-                span.className = 'hero-char';
-                span.style.animationDelay = `${i * 0.2}s`;
-                span.textContent = char;
-                h1.appendChild(span);
-            });
-
-            // Step 4: Buttons after chars are mostly visible
-            setTimeout(() => {
-                if (!btns) return;
-                btns.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                btns.style.transform  = 'translateY(0)';
-                btns.style.opacity    = '1';
-            }, 1600);
-        }, 500);
-    }, 1800);
+    // Expose completion time so other widgets can sync
+    window.__heroAnimEnd = START + 3000; // buttons visible + small buffer
 }
 
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
@@ -840,6 +889,7 @@ window.addEventListener('pageshow', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    initIntroSplash();
     initScrollObserver();
     initPageTransition();
     initWipeLinks();

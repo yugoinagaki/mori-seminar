@@ -224,6 +224,9 @@
     animation: kb-zoom-in 6s ease forwards;
 }
 
+/* ── Intro splash (once per session) ───────────────────────────────────────── */
+.intro-seen #intro-splash { display: none !important; }
+
 /* ── Members marquee (home page) ────────────────────────────────────────────── */
 @keyframes members-marquee {
     from { transform: translateX(0); }
