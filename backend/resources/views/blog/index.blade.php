@@ -18,7 +18,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($posts as $post)
             <a href="/blog/{{ $post->slug }}" class="group block" data-wipe-link>
-                <div class="aspect-video bg-primary-50 overflow-hidden mb-4">
+                <div class="aspect-square bg-primary-50 overflow-hidden mb-4">
                     @if($post->thumbnail_url)
                     <img src="{{ storage_url($post->thumbnail_url) }}" alt="{{ $post->title }}"
                          loading="lazy" decoding="async"
