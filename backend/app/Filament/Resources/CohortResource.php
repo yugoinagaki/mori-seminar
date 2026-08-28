@@ -16,11 +16,11 @@ class CohortResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = '期の管理';
+    protected static ?string $navigationLabel = '期 (Cohort)';
 
-    protected static ?string $navigationGroup = 'コンテンツ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 41;
 
     public static function form(Form $form): Form
     {

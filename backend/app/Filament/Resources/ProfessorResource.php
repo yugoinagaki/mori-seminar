@@ -15,10 +15,10 @@ class ProfessorResource extends Resource
 {
     protected static ?string $model = Professor::class;
 
-    protected static ?string $navigationIcon  = 'heroicon-o-academic-cap';
+    protected static ?string $navigationIcon  = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = '教授プロフィール';
-    protected static ?string $navigationGroup = 'コンテンツ';
-    protected static ?int    $navigationSort  = 3;
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
+    protected static ?int    $navigationSort  = 30;
 
     public static function form(Form $form): Form
     {

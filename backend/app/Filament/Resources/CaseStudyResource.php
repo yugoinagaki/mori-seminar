@@ -17,7 +17,10 @@ class CaseStudyResource extends Resource
 {
     protected static ?string $model = CaseStudy::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon  = 'heroicon-o-briefcase';
+    protected static ?string $navigationLabel = 'ケーススタディ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
+    protected static ?int    $navigationSort  = 50;
 
     public static function form(Form $form): Form
     {

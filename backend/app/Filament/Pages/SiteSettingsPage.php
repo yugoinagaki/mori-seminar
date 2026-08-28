@@ -18,11 +18,11 @@ class SiteSettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon  = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'サイト設定';
-    protected static ?string $navigationGroup = '設定';
-    protected static ?string $title           = 'サイト設定';
-    protected static ?int    $navigationSort  = 99;
+    protected static ?string $navigationIcon  = 'heroicon-o-paint-brush';
+    protected static ?string $navigationLabel = 'サイト外観 (画像)';
+    protected static ?string $navigationGroup = 'サイト設定';
+    protected static ?string $title           = 'サイト外観';
+    protected static ?int    $navigationSort  = 30;
 
     protected static string $view = 'filament.pages.site-settings-page';
 

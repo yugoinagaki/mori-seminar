@@ -16,11 +16,11 @@ class MemberResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationLabel = 'メンバー管理';
+    protected static ?string $navigationLabel = 'ゼミ生';
 
-    protected static ?string $navigationGroup = 'コンテンツ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 40;
 
     public static function form(Form $form): Form
     {

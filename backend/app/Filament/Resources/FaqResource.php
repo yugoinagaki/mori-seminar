@@ -16,11 +16,11 @@ class FaqResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $navigationLabel = 'FAQ管理';
+    protected static ?string $navigationLabel = 'FAQ';
 
-    protected static ?string $navigationGroup = 'コンテンツ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 60;
 
     public static function form(Form $form): Form
     {

@@ -19,11 +19,11 @@ class PostResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = '記事管理（Blog/News）';
+    protected static ?string $navigationLabel = '記事 (News / Blog)';
 
-    protected static ?string $navigationGroup = 'コンテンツ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 20;
 
     public static function form(Form $form): Form
     {

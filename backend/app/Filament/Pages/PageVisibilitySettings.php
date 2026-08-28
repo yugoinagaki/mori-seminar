@@ -22,7 +22,7 @@ class PageVisibilitySettings extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'サイト設定';
 
-    protected static ?int $navigationSort = 100;
+    protected static ?int $navigationSort = 10;
 
     protected static string $view = 'filament.pages.page-visibility-settings';
 

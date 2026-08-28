@@ -22,7 +22,7 @@ class ContactSettings extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'サイト設定';
 
-    protected static ?int $navigationSort = 101;
+    protected static ?int $navigationSort = 20;
 
     protected static string $view = 'filament.pages.contact-settings';
 

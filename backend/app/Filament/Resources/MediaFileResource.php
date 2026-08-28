@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Storage;
 class MediaFileResource extends Resource
 {
     protected static ?string $model           = MediaFile::class;
-    protected static ?string $navigationIcon  = 'heroicon-o-photo';
+    protected static ?string $navigationIcon  = 'heroicon-o-folder-open';
     protected static ?string $navigationLabel = 'メディア管理';
-    protected static ?string $navigationGroup = '設定';
+    protected static ?string $navigationGroup = 'サイト設定';
     protected static ?string $pluralLabel     = 'メディア管理';
     protected static ?string $label           = 'メディアファイル';
-    protected static ?int    $navigationSort  = 50;
+    protected static ?int    $navigationSort  = 40;
 
     public static function table(Table $table): Table
     {
