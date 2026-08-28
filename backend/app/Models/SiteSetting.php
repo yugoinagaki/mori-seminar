@@ -17,7 +17,10 @@ class SiteSetting extends Model
         'contact'      => 'Contact',
     ];
 
-    protected $fillable = ['hero_image_url', 'transition_image_urls', 'page_visibilities'];
+    protected $fillable = [
+        'hero_image_url', 'transition_image_urls', 'page_visibilities',
+        'contact_email', 'contact_twitter_url', 'contact_instagram_url',
+    ];
 
     protected $casts = [
         'transition_image_urls' => 'array',
@@ -35,5 +38,25 @@ class SiteSetting extends Model
 
         // Default: visible when key is missing (backwards-compatible)
         return $visibilities[$key] ?? true;
+    }
+
+    public function twitterHandle(): ?string
+    {
+        return $this->handleFromUrl($this->contact_twitter_url);
+    }
+
+    public function instagramHandle(): ?string
+    {
+        return $this->handleFromUrl($this->contact_instagram_url);
+    }
+
+    private function handleFromUrl(?string $url): ?string
+    {
+        if (!$url) return null;
+        $path = trim(parse_url($url, PHP_URL_PATH) ?? '', '/');
+        if ($path === '') return null;
+        // Take first segment (in case of extra path)
+        $handle = explode('/', $path)[0];
+        return '@' . $handle;
     }
 }
