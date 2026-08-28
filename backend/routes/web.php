@@ -40,14 +40,38 @@ Route::middleware(['auth', EnsureUserIsAdmin::class])->group(function () {
 });
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/theme', [ThemeController::class, 'index']);
-Route::get('/news', [NewsController::class, 'index']);
-Route::get('/news/{slug}', [NewsController::class, 'show']);
-Route::get('/blog', [BlogController::class, 'index']);
-Route::get('/blog/{slug}', [BlogController::class, 'show']);
-Route::get('/members', [MembersController::class, 'index']);
-Route::get('/professor', [ProfessorPageController::class, 'index']);
-Route::get('/case-studies', [CaseStudyPageController::class, 'index']);
-Route::get('/case-studies/{slug}', [CaseStudyPageController::class, 'show']);
-Route::get('/faq', [FaqPageController::class, 'index']);
-Route::get('/contact', [ContactController::class, 'index']);
+
+Route::middleware('page-visible:theme')->group(function () {
+    Route::get('/theme', [ThemeController::class, 'index']);
+});
+
+Route::middleware('page-visible:news')->group(function () {
+    Route::get('/news', [NewsController::class, 'index']);
+    Route::get('/news/{slug}', [NewsController::class, 'show']);
+});
+
+Route::middleware('page-visible:blog')->group(function () {
+    Route::get('/blog', [BlogController::class, 'index']);
+    Route::get('/blog/{slug}', [BlogController::class, 'show']);
+});
+
+Route::middleware('page-visible:members')->group(function () {
+    Route::get('/members', [MembersController::class, 'index']);
+});
+
+Route::middleware('page-visible:professor')->group(function () {
+    Route::get('/professor', [ProfessorPageController::class, 'index']);
+});
+
+Route::middleware('page-visible:case_studies')->group(function () {
+    Route::get('/case-studies', [CaseStudyPageController::class, 'index']);
+    Route::get('/case-studies/{slug}', [CaseStudyPageController::class, 'show']);
+});
+
+Route::middleware('page-visible:faq')->group(function () {
+    Route::get('/faq', [FaqPageController::class, 'index']);
+});
+
+Route::middleware('page-visible:contact')->group(function () {
+    Route::get('/contact', [ContactController::class, 'index']);
+});

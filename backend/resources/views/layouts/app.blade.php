@@ -52,17 +52,17 @@
             {{-- Desktop nav --}}
             <ul class="hidden lg:flex items-center gap-8">
                 @php
-                    $navLinks = [
-                        ['label' => 'Home',         'href' => '/'],
-                        ['label' => 'Theme',        'href' => '/theme'],
-                        ['label' => 'News',         'href' => '/news'],
-                        ['label' => 'Professor',    'href' => '/professor'],
-                        ['label' => 'Blog',         'href' => '/blog'],
-                        ['label' => 'Members',      'href' => '/members'],
-                        ['label' => 'Case Studies', 'href' => '/case-studies'],
-                        ['label' => 'FAQ',          'href' => '/faq'],
-                        ['label' => 'Contact',      'href' => '/contact'],
-                    ];
+                    $navLinks = collect([
+                        ['label' => 'Home',         'href' => '/',             'key' => null],
+                        ['label' => 'Theme',        'href' => '/theme',        'key' => 'theme'],
+                        ['label' => 'News',         'href' => '/news',         'key' => 'news'],
+                        ['label' => 'Professor',    'href' => '/professor',    'key' => 'professor'],
+                        ['label' => 'Blog',         'href' => '/blog',         'key' => 'blog'],
+                        ['label' => 'Members',      'href' => '/members',      'key' => 'members'],
+                        ['label' => 'Case Studies', 'href' => '/case-studies', 'key' => 'case_studies'],
+                        ['label' => 'FAQ',          'href' => '/faq',          'key' => 'faq'],
+                        ['label' => 'Contact',      'href' => '/contact',      'key' => 'contact'],
+                    ])->filter(fn ($l) => $l['key'] === null || $setting->isPageVisible($l['key']))->values();
                 @endphp
                 @foreach($navLinks as $link)
                 <li>
@@ -139,16 +139,19 @@
                 <div>
                     <h4 class="text-[10px] tracking-[0.25em] uppercase text-white/35 font-semibold mb-6">Menu</h4>
                     <ul class="grid grid-cols-2 gap-x-6 gap-y-3">
-                        @foreach([
-                            ['Annual Theme', '/theme'],
-                            ['News', '/news'],
-                            ['Professor', '/professor'],
-                            ['Blog', '/blog'],
-                            ['Members', '/members'],
-                            ['Case Studies', '/case-studies'],
-                            ['FAQ', '/faq'],
-                            ['Contact', '/contact'],
-                        ] as [$label, $href])
+                        @php
+                            $footerLinks = collect([
+                                ['Annual Theme', '/theme',        'theme'],
+                                ['News',         '/news',         'news'],
+                                ['Professor',    '/professor',    'professor'],
+                                ['Blog',         '/blog',         'blog'],
+                                ['Members',      '/members',      'members'],
+                                ['Case Studies', '/case-studies', 'case_studies'],
+                                ['FAQ',          '/faq',          'faq'],
+                                ['Contact',      '/contact',      'contact'],
+                            ])->filter(fn ($l) => $setting->isPageVisible($l[2]));
+                        @endphp
+                        @foreach($footerLinks as [$label, $href, $key])
                         <li>
                             <a href="{{ $href }}" class="text-white/55 hover:text-white text-sm transition-colors" data-wipe-link>
                                 {{ $label }}
