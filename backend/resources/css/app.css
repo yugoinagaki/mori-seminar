@@ -182,6 +182,38 @@
     background: rgba(4, 28, 51, 0.35);
 }
 
+/* Delayed "LOADING..." indicator — only appears if the wipe overlay
+   stays visible for longer than ~2s (slow network / stalled navigation).
+   Fast transitions remove the overlay before the animation delay elapses. */
+.wipe-wrapper::before,
+.wipe-wrapper-static::before {
+    content: 'Loading...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: nowrap;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(4, 28, 51, 0.4);
+    z-index: 10;
+    opacity: 0;
+    animation: wipe-loader-appear 400ms ease-out forwards,
+               wipe-loader-pulse 1.4s ease-in-out 400ms infinite;
+    pointer-events: none;
+}
+@keyframes wipe-loader-appear {
+    to { opacity: 1; }
+}
+@keyframes wipe-loader-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+}
+
 /* Mobile menu transition */
 .mobile-menu-enter {
     transition: opacity 250ms ease-out, transform 250ms ease-out;
