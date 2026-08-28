@@ -18,51 +18,37 @@ class AnnualThemeResource extends Resource
 {
     protected static ?string $model = AnnualTheme::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon  = 'heroicon-o-sparkles';
+    protected static ?string $navigationLabel = '年間テーマ';
+    protected static ?string $navigationGroup = 'サイトコンテンツ';
+    protected static ?int    $navigationSort  = 10;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('year')
-                    ->label('年度')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('year')
+                        ->label('年度')
+                        ->required()
+                        ->numeric(),
+                    Forms\Components\Select::make('semester')
+                        ->label('期')
+                        ->options([
+                            'spring' => '春学期',
+                            'fall'   => '秋学期',
+                        ])
+                        ->placeholder('通年（未指定）')
+                        ->helperText('同じ年度で春・秋を分ける場合に指定。空欄なら通年テーマ扱い。'),
+                ]),
                 Forms\Components\TextInput::make('title')
                     ->label('テーマタイトル')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
-                Forms\Components\FileUpload::make('photo_url')
-                    ->label('テーマページ用 集合写真（1枚）')
-                    ->helperText('/theme ページ上部に表示。推奨: 横長（16:9 以上）・5 MB 以下。')
-                    ->image()
-                    ->disk('public')
-                    ->directory('theme-photos')
-                    ->visibility('public')
-                    ->imagePreviewHeight('180')
-                    ->maxSize(5 * 1024)
-                    ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。'])
-                    ->deletable()
-                    ->nullable()
-                    ->hintAction(MediaPickerAction::make('photo_url'))
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('slideshow_photo_urls')
-                    ->label('トップページ用 スライドショー写真（最大10枚）')
-                    ->helperText('トップページのテーマセクション右側にスライドショー表示。各 5 MB 以下。')
-                    ->image()
-                    ->multiple()
-                    ->maxFiles(10)
-                    ->disk('public')
-                    ->directory('theme-slideshow')
-                    ->visibility('public')
-                    ->imagePreviewHeight('140')
-                    ->maxSize(5 * 1024)
-                    ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 5 MB）。'])
-                    ->reorderable()
-                    ->deletable()
-                    ->nullable()
-                    ->hintAction(MediaPickerAction::make('slideshow_photo_urls', null, true))
+                Forms\Components\Placeholder::make('_photos_note')
+                    ->label('写真')
+                    ->content('集合写真とスライドショーは「年度の写真」から年度単位で管理します。')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('content')
                     ->label('本文')
@@ -78,14 +64,22 @@ class AnnualThemeResource extends Resource
                     ->label('年度')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('semester')
+                    ->label('期')
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'spring' => '春学期',
+                        'fall'   => '秋学期',
+                        default  => '通年',
+                    })
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'spring' => 'success',
+                        'fall'   => 'warning',
+                        default  => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('title')
                     ->label('テーマ')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('photo_url')
-                    ->label('集合写真')
-                    ->disk('public')
-                    ->height(48)
-                    ->defaultImageUrl(null),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -6,6 +6,7 @@ use App\Models\AnnualTheme;
 use App\Models\Post;
 use App\Models\Professor;
 use App\Models\SiteSetting;
+use App\Models\ThemeYear;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
@@ -13,7 +14,8 @@ class HomeController extends Controller
     public function index()
     {
         $setting   = SiteSetting::instance();
-        $theme     = AnnualTheme::orderBy('year', 'desc')->first();
+        $theme     = AnnualTheme::orderBy('year', 'desc')->orderedByRecency()->first();
+        $themeYear = $theme ? ThemeYear::where('year', $theme->year)->first() : null;
         $professor = \App\Models\Professor::first();
         $recentPosts = Post::with(['author:id,name', 'tags:id,name,slug'])
             ->where('status', 'published')
@@ -52,6 +54,6 @@ class HomeController extends Controller
             }
         }
 
-        return view('home.index', compact('setting', 'theme', 'professor', 'recentPosts', 'worldNews'));
+        return view('home.index', compact('setting', 'theme', 'themeYear', 'professor', 'recentPosts', 'worldNews'));
     }
 }
