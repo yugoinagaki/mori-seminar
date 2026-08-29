@@ -72,7 +72,14 @@ function initPageTransition() {
     if (forest) forest.style.backgroundImage = `url('${pending}')`;
 
     overlay.classList.add('is-animating');
-    overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+    // Filter by animation name: the LOADING pseudo-element also fires
+    // animationend events which we must ignore to let r-expand finish.
+    const onEnd = (e) => {
+        if (e.animationName !== 'r-expand') return;
+        overlay.removeEventListener('animationend', onEnd);
+        overlay.remove();
+    };
+    overlay.addEventListener('animationend', onEnd);
     setTimeout(() => overlay.remove(), ANIM_MS + 200);
 }
 
