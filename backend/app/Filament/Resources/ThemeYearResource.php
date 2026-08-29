@@ -35,6 +35,9 @@ class ThemeYearResource extends Resource
                     ->label('年度')
                     ->required()
                     ->numeric()
+                    ->minValue(1900)
+                    ->maxValue(2100)
+                    ->step(1)
                     ->unique(ignoreRecord: true)
                     ->helperText('この年度のテーマページとトップページで使う写真をまとめて管理します。'),
 

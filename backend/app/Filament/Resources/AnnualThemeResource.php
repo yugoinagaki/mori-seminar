@@ -31,7 +31,10 @@ class AnnualThemeResource extends Resource
                     Forms\Components\TextInput::make('year')
                         ->label('年度')
                         ->required()
-                        ->numeric(),
+                        ->numeric()
+                        ->minValue(1900)
+                        ->maxValue(2100)
+                        ->step(1),
                     Forms\Components\Select::make('semester')
                         ->label('期')
                         ->options([

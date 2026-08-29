@@ -37,6 +37,8 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('order_index')
                     ->required()
                     ->numeric()
+                    ->minValue(0)
+                    ->step(1)
                     ->default(0),
             ]);
     }

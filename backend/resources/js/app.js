@@ -355,27 +355,32 @@ function initIntroSplash() {
 
 // ─── FAQ accordion ────────────────────────────────────────────────────────────
 function initFaq() {
-    let openId = null;
-    document.querySelectorAll('[data-faq-button]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const id     = button.dataset.faqButton;
-            const answer = document.querySelector(`[data-faq-answer="${id}"]`);
-            const arrow  = button.querySelector('[data-faq-arrow]');
+    const items = document.querySelectorAll('.faq-item');
+    if (!items.length) return;
 
-            if (openId === id) {
-                answer.style.display = 'none';
-                arrow.classList.remove('rotate-180');
-                openId = null;
+    let openItem = null;
+
+    items.forEach((item) => {
+        const button = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const arrow  = item.querySelector('.faq-chevron');
+        if (!button || !answer) return;
+
+        button.addEventListener('click', () => {
+            const isOpen = !answer.classList.contains('hidden');
+
+            if (isOpen) {
+                answer.classList.add('hidden');
+                arrow?.classList.remove('rotate-180');
+                openItem = null;
             } else {
-                if (openId) {
-                    const prevAnswer = document.querySelector(`[data-faq-answer="${openId}"]`);
-                    const prevArrow  = document.querySelector(`[data-faq-button="${openId}"] [data-faq-arrow]`);
-                    if (prevAnswer) prevAnswer.style.display = 'none';
-                    if (prevArrow)  prevArrow.classList.remove('rotate-180');
+                if (openItem && openItem !== item) {
+                    openItem.querySelector('.faq-answer')?.classList.add('hidden');
+                    openItem.querySelector('.faq-chevron')?.classList.remove('rotate-180');
                 }
-                answer.style.display = '';
-                arrow.classList.add('rotate-180');
-                openId = id;
+                answer.classList.remove('hidden');
+                arrow?.classList.add('rotate-180');
+                openItem = item;
             }
         });
     });

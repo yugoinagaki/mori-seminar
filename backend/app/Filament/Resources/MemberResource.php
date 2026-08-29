@@ -67,6 +67,8 @@ class MemberResource extends Resource
                         Forms\Components\TextInput::make('order_index')
                             ->label('表示順')
                             ->numeric()
+                            ->minValue(0)
+                            ->step(1)
                             ->default(0),
                     ])
                     ->columnSpan(1),

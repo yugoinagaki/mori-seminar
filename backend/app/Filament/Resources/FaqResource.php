@@ -39,7 +39,10 @@ class FaqResource extends Resource
                 Forms\Components\TextInput::make('order_index')
                     ->label('表示順')
                     ->numeric()
-                    ->default(0),
+                    ->minValue(0)
+                    ->step(1)
+                    ->default(0)
+                    ->helperText('0以上の整数。小さい順に上から表示されます。'),
 
                 Forms\Components\Toggle::make('is_active')
                     ->label('表示する')
