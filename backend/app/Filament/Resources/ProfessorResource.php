@@ -54,15 +54,57 @@ class ProfessorResource extends Resource
                     ->columnSpan(2),
 
                 Forms\Components\Section::make('研究テーマ')
+                    ->description('段落・箇条書き・強調が使えます。旧タグ形式(research_themes)は本文が空の時のフォールバック。')
                     ->schema([
+                        Forms\Components\RichEditor::make('research_themes_body')
+                            ->label('')
+                            ->toolbarButtons([
+                                'bold', 'italic', 'underline',
+                                'bulletList', 'orderedList',
+                                'link',
+                                'undo', 'redo',
+                            ])
+                            ->columnSpanFull(),
                         Forms\Components\TagsInput::make('research_themes')
-                            ->label('研究テーマ（Enterで追加）')
+                            ->label('（旧）タグ形式')
                             ->placeholder('例: 国際政治学')
+                            ->helperText('本文を入力するとこちらは公開ページで使われなくなります。')
                             ->nullable(),
                     ])
-                    ->columnSpan(1),
+                    ->columnSpan(3),
 
-                Forms\Components\Section::make('プロフィール本文')
+                Forms\Components\Section::make('紹介文 (ブロック)')
+                    ->description('見出しと本文をセットで複数ブロック登録できます。ブロックが1つもない時は下の「プロフィール本文 (旧)」が表示されます。')
+                    ->schema([
+                        Forms\Components\Repeater::make('bio_blocks')
+                            ->label('')
+                            ->schema([
+                                Forms\Components\TextInput::make('heading')
+                                    ->label('見出し')
+                                    ->maxLength(100)
+                                    ->placeholder('例: Profile / Career / Present'),
+                                Forms\Components\RichEditor::make('body')
+                                    ->label('本文')
+                                    ->toolbarButtons([
+                                        'bold', 'italic', 'underline', 'strike',
+                                        'h2', 'h3',
+                                        'bulletList', 'orderedList',
+                                        'link', 'blockquote',
+                                        'undo', 'redo',
+                                    ])
+                                    ->columnSpanFull(),
+                            ])
+                            ->itemLabel(fn (array $state): string => $state['heading'] ?? '（見出し未入力）')
+                            ->addActionLabel('ブロックを追加')
+                            ->reorderable()
+                            ->collapsible()
+                            ->collapsed()
+                            ->nullable(),
+                    ])
+                    ->columnSpan(3),
+
+                Forms\Components\Section::make('プロフィール本文 (旧・フォールバック)')
+                    ->description('上の「紹介文 (ブロック)」を1件以上入れると、こちらは公開ページで使われなくなります。')
                     ->schema([
                         Forms\Components\RichEditor::make('bio')
                             ->label('')
@@ -75,6 +117,8 @@ class ProfessorResource extends Resource
                             ])
                             ->columnSpanFull(),
                     ])
+                    ->collapsible()
+                    ->collapsed()
                     ->columnSpan(3),
 
                 Forms\Components\Section::make('経歴')
@@ -118,7 +162,7 @@ class ProfessorResource extends Resource
                     ])
                     ->columnSpan(3),
 
-                Forms\Components\Section::make('著書・論文')
+                Forms\Components\Section::make('著書')
                     ->description('ドラッグで並び替え可能。表紙画像・タイトル・出版年・出版社・説明文を入力してください。')
                     ->schema([
                         Forms\Components\Repeater::make('books')
@@ -163,6 +207,72 @@ class ProfessorResource extends Resource
                             ->collapsible()
                             ->collapsed()
                             ->nullable(),
+                    ])
+                    ->columnSpan(3),
+
+                Forms\Components\Section::make('論文')
+                    ->description('表紙画像なしのシンプルなリスト表示。タイトル・掲載誌・出版年・リンク・要旨を入力。')
+                    ->schema([
+                        Forms\Components\Repeater::make('papers')
+                            ->label('')
+                            ->schema([
+                                Forms\Components\TextInput::make('title')
+                                    ->label('タイトル')
+                                    ->required()
+                                    ->columnSpanFull(),
+                                Forms\Components\Grid::make(3)->schema([
+                                    Forms\Components\TextInput::make('journal')
+                                        ->label('掲載誌 / 出版社')
+                                        ->placeholder('例: 東洋経済新報社 / 国際政治')
+                                        ->columnSpan(2),
+                                    Forms\Components\TextInput::make('year')
+                                        ->label('出版年')
+                                        ->numeric()
+                                        ->minValue(1900)
+                                        ->maxValue(2099)
+                                        ->step(1)
+                                        ->columnSpan(1),
+                                ]),
+                                Forms\Components\TextInput::make('url')
+                                    ->label('リンク (任意)')
+                                    ->url()
+                                    ->placeholder('https://...')
+                                    ->columnSpanFull(),
+                                Forms\Components\Textarea::make('description')
+                                    ->label('要旨 (任意)')
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ])
+                            ->itemLabel(fn (array $state): string => $state['title'] ?? '（タイトル未入力）')
+                            ->addActionLabel('論文を追加')
+                            ->reorderable()
+                            ->collapsible()
+                            ->collapsed()
+                            ->nullable(),
+                    ])
+                    ->columnSpan(3),
+
+                Forms\Components\Section::make('業績一覧 (PDFリンク)')
+                    ->description('PDFをアップロードすると公開ページに「業績一覧 (PDF) →」のリンクが表示されます。')
+                    ->schema([
+                        Forms\Components\FileUpload::make('achievements_pdf_url')
+                            ->label('業績一覧PDF')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->disk('public')
+                            ->directory('professor/achievements')
+                            ->visibility('public')
+                            ->maxSize(20 * 1024)
+                            ->validationMessages(['max' => 'ファイルサイズが大きすぎます（上限 20 MB）。'])
+                            ->downloadable()
+                            ->openable()
+                            ->nullable()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('achievements_pdf_note')
+                            ->label('補足テキスト')
+                            ->placeholder('例: 2026年4月15日現在')
+                            ->helperText('リンクの下に小さく表示される注釈。空欄でもOK。')
+                            ->maxLength(100)
+                            ->columnSpanFull(),
                     ])
                     ->columnSpan(3),
 

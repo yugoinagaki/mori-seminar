@@ -38,7 +38,14 @@
                         {{ $professor->title ?? '慶應義塾大学 法学部 教授' }}
                     </p>
                 </div>
-                @if($professor?->research_themes)
+                @if($professor?->research_themes_body)
+                <div class="mt-6">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-3">研究テーマ</p>
+                    <div class="text-gray-600 text-sm leading-[1.9] break-words [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-primary-700 [&_a]:underline">
+                        {!! $professor->research_themes_body !!}
+                    </div>
+                </div>
+                @elseif($professor?->research_themes)
                 <div class="mt-6">
                     <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-3">研究テーマ</p>
                     <div class="flex flex-wrap gap-2">
@@ -54,24 +61,65 @@
                     @endforeach
                 </div>
                 @endif
+
+                @if(!empty($professor?->achievements_pdf_url))
+                <div class="mt-6">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-3">業績一覧</p>
+                    <a href="{{ storage_url($professor->achievements_pdf_url) }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center gap-2 text-sm text-primary-700 hover:text-primary-900 font-medium border-b border-primary-700/40 hover:border-primary-900 pb-1 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        業績一覧 (PDF)
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
+                    @if($professor->achievements_pdf_note)
+                    <p class="text-[11px] text-gray-400 mt-1.5 font-mono tracking-wide">{{ $professor->achievements_pdf_note }}</p>
+                    @endif
+                </div>
+                @endif
             </div>
 
             {{-- Text --}}
             <div class="md:col-span-2 space-y-12">
+                @php
+                    $blocks = collect($professor?->bio_blocks ?? [])
+                        ->filter(fn ($b) => !empty($b['heading']) || !empty($b['body']));
+                @endphp
+                @if($blocks->isNotEmpty())
+                <div class="space-y-10">
+                    @foreach($blocks as $block)
+                    <div>
+                        @if(!empty($block['heading']))
+                        <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">{{ $block['heading'] }}</p>
+                        @endif
+                        @if(!empty($block['body']))
+                        <div class="text-gray-600 text-sm leading-[2] break-words [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-gray-800 [&_h3]:mt-4 [&_a]:text-primary-700 [&_a]:underline">
+                            {!! $block['body'] !!}
+                        </div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+                @elseif($professor?->bio)
                 <div>
                     <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">プロフィール</p>
-                    @if($professor?->bio)
-                    <div class="text-gray-600 text-sm leading-[2]"
+                    <div class="text-gray-600 text-sm leading-[2] break-words [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap"
                          data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="bio">
                         {!! $professor->bio !!}
                     </div>
-                    @else
+                </div>
+                @else
+                <div>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">プロフィール</p>
                     <div class="text-gray-600 text-sm leading-[2] space-y-4">
                         <p>専門は国際政治学、現代アメリカ外交、冷戦史。外務省勤務後、コロンビア大学ロースクール修了。東京大学にて博士号取得。現在、慶應義塾大学法学部教授。</p>
                         <p>現在の研究領域は国際秩序の動態分析、アメリカのインド太平洋戦略、人工知能などの先端技術と安全保障の関係。</p>
                     </div>
-                    @endif
                 </div>
+                @endif
 
                 @if($professor?->career)
                 <div>
@@ -111,7 +159,7 @@
 
                 @if(!empty($professor?->books))
                 <div>
-                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">著書・論文</p>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">著書</p>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                         @foreach($professor->books as $book)
                         @php
@@ -148,6 +196,40 @@
                         </div>
                         @endforeach
                     </div>
+                </div>
+                @endif
+
+                @if(!empty($professor?->papers))
+                <div>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">論文</p>
+                    <ul class="divide-y divide-gray-100">
+                        @foreach($professor->papers as $paper)
+                        <li class="py-5 flex gap-4 md:gap-6">
+                            <span class="text-gray-400 text-xs font-mono w-14 shrink-0 pt-0.5">
+                                {{ $paper['year'] ?? '' }}
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                @if(!empty($paper['url']))
+                                <a href="{{ $paper['url'] }}" target="_blank" rel="noopener"
+                                   class="group text-sm text-gray-800 font-medium hover:text-primary-700 transition-colors leading-snug inline-flex items-start gap-1.5">
+                                    <span>{{ $paper['title'] ?? '' }}</span>
+                                    <svg class="w-3 h-3 mt-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </a>
+                                @else
+                                <p class="text-sm text-gray-800 font-medium leading-snug">{{ $paper['title'] ?? '' }}</p>
+                                @endif
+                                @if(!empty($paper['journal']))
+                                <p class="text-xs text-gray-500 mt-1.5">{{ $paper['journal'] }}</p>
+                                @endif
+                                @if(!empty($paper['description']))
+                                <p class="text-xs text-gray-400 mt-2 leading-relaxed">{{ $paper['description'] }}</p>
+                                @endif
+                            </div>
+                        </li>
+                        @endforeach
+                    </ul>
                 </div>
                 @endif
             </div>
