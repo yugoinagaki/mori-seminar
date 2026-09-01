@@ -137,10 +137,7 @@
                 {{-- Brand --}}
                 <div>
                     <p class="text-[9px] tracking-[0.3em] uppercase text-white/35 mb-2">Keio University</p>
-                    <h3 class="text-2xl font-bold mb-5 tracking-wide">森聡研究会</h3>
-                    <p class="text-white/40 text-sm leading-relaxed mb-8">
-                        国際政治学・現代アメリカ外交・<br>先端技術を研究するゼミナール
-                    </p>
+                    <h3 class="text-2xl font-bold mb-8 tracking-wide">森聡研究会</h3>
                     <div class="flex gap-5">
                         @if($setting->contact_twitter_url)
                         <a href="{{ $setting->contact_twitter_url }}" target="_blank" rel="noopener"
