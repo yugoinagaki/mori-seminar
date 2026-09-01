@@ -84,7 +84,7 @@
                 @if(!empty($professor?->gallery_photo_urls))
                 <div class="mt-16">
                     <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">ギャラリー</p>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-3 md:grid-cols-1 gap-2 md:gap-4">
                         @foreach($professor->gallery_photo_urls as $photo)
                         @php $photoPath = is_array($photo) ? (reset($photo) ?: null) : $photo; @endphp
                         @if($photoPath)
