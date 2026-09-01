@@ -80,6 +80,25 @@
                     @endif
                 </div>
                 @endif
+
+                @if(!empty($professor?->gallery_photo_urls))
+                <div class="mt-16">
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-4">ギャラリー</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach($professor->gallery_photo_urls as $photo)
+                        @php $photoPath = is_array($photo) ? (reset($photo) ?: null) : $photo; @endphp
+                        @if($photoPath)
+                        <div class="aspect-square overflow-hidden bg-gray-100">
+                            <img src="{{ storage_url($photoPath) }}"
+                                 alt="ギャラリー"
+                                 loading="lazy"
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        @endif
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
 
             {{-- Text --}}
@@ -157,6 +176,40 @@
                 </div>
                 @endif
 
+                @if(!empty($professor?->papers))
+                <div>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">論文</p>
+                    <ul class="divide-y divide-gray-100">
+                        @foreach($professor->papers as $paper)
+                        <li class="py-5 flex gap-4 md:gap-6">
+                            <span class="text-gray-400 text-xs font-mono w-14 shrink-0 pt-0.5">
+                                {{ $paper['year'] ?? '' }}
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                @if(!empty($paper['url']))
+                                <a href="{{ $paper['url'] }}" target="_blank" rel="noopener"
+                                   class="group text-sm text-gray-800 font-medium hover:text-primary-700 transition-colors leading-snug inline-flex items-start gap-1.5">
+                                    <span>{{ $paper['title'] ?? '' }}</span>
+                                    <svg class="w-3 h-3 mt-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </a>
+                                @else
+                                <p class="text-sm text-gray-800 font-medium leading-snug">{{ $paper['title'] ?? '' }}</p>
+                                @endif
+                                @if(!empty($paper['journal']))
+                                <p class="text-xs text-gray-500 mt-1.5">{{ $paper['journal'] }}</p>
+                                @endif
+                                @if(!empty($paper['description']))
+                                <p class="text-xs text-gray-400 mt-2 leading-relaxed">{{ $paper['description'] }}</p>
+                                @endif
+                            </div>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
                 @if(!empty($professor?->books))
                 <div>
                     <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">著書</p>
@@ -198,62 +251,8 @@
                     </div>
                 </div>
                 @endif
-
-                @if(!empty($professor?->papers))
-                <div>
-                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">論文</p>
-                    <ul class="divide-y divide-gray-100">
-                        @foreach($professor->papers as $paper)
-                        <li class="py-5 flex gap-4 md:gap-6">
-                            <span class="text-gray-400 text-xs font-mono w-14 shrink-0 pt-0.5">
-                                {{ $paper['year'] ?? '' }}
-                            </span>
-                            <div class="flex-1 min-w-0">
-                                @if(!empty($paper['url']))
-                                <a href="{{ $paper['url'] }}" target="_blank" rel="noopener"
-                                   class="group text-sm text-gray-800 font-medium hover:text-primary-700 transition-colors leading-snug inline-flex items-start gap-1.5">
-                                    <span>{{ $paper['title'] ?? '' }}</span>
-                                    <svg class="w-3 h-3 mt-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                                @else
-                                <p class="text-sm text-gray-800 font-medium leading-snug">{{ $paper['title'] ?? '' }}</p>
-                                @endif
-                                @if(!empty($paper['journal']))
-                                <p class="text-xs text-gray-500 mt-1.5">{{ $paper['journal'] }}</p>
-                                @endif
-                                @if(!empty($paper['description']))
-                                <p class="text-xs text-gray-400 mt-2 leading-relaxed">{{ $paper['description'] }}</p>
-                                @endif
-                            </div>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
             </div>
         </div>
-
-        {{-- Gallery --}}
-        @if(!empty($professor?->gallery_photo_urls))
-        <div class="mt-16">
-            <p class="text-xs font-semibold tracking-[0.2em] uppercase text-primary-700 mb-6">ギャラリー</p>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                @foreach($professor->gallery_photo_urls as $photo)
-                @php $photoPath = is_array($photo) ? (reset($photo) ?: null) : $photo; @endphp
-                @if($photoPath)
-                <div class="aspect-square overflow-hidden bg-gray-100">
-                    <img src="{{ storage_url($photoPath) }}"
-                         alt="ギャラリー"
-                         loading="lazy"
-                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-                </div>
-                @endif
-                @endforeach
-            </div>
-        </div>
-        @endif
     </div>
 </div>
 @endsection
