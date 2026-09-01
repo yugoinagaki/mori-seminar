@@ -30,7 +30,7 @@
 
     <div class="max-w-4xl mx-auto px-6 md:px-14 py-16">
         @if($cs->content)
-        <div class="prose prose-lg prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-700"
+        <div class="prose prose-lg prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-700 [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap"
              data-editable data-model="case_study" data-id="{{ $cs->id }}" data-field="content">
             {!! $cs->content !!}
         </div>

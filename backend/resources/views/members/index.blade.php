@@ -131,7 +131,7 @@
 
                         <div class="border-t border-gray-100 pt-6">
                             <p class="text-[10px] tracking-[0.35em] uppercase text-gray-400 mb-4">About</p>
-                            <div id="member-modal-bio" class="text-[13.5px] text-gray-700 leading-loose whitespace-pre-line break-words"></div>
+                            <div id="member-modal-bio" class="text-[13.5px] text-gray-700 leading-loose whitespace-pre-wrap break-words"></div>
                             <p id="member-modal-bio-empty" class="hidden text-sm text-gray-300 italic">自己紹介は登録されていません</p>
                         </div>
                     </div>

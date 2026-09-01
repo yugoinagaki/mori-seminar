@@ -71,7 +71,7 @@
             @endif
 
             @if($theme->content)
-            <div class="fade-in prose prose-lg prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-700"
+            <div class="fade-in prose prose-lg prose-gray max-w-none prose-headings:font-bold prose-a:text-primary-700 [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap"
                  data-editable data-model="annual_theme" data-id="{{ $theme->id }}" data-field="content">
                 {!! $theme->content !!}
             </div>

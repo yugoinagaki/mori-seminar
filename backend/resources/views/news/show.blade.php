@@ -39,7 +39,8 @@
         <div class="prose prose-lg prose-gray max-w-none
                     prose-headings:font-bold prose-headings:text-gray-900
                     prose-a:text-primary-700 prose-a:no-underline hover:prose-a:underline
-                    prose-img:rounded prose-img:w-full"
+                    prose-img:rounded prose-img:w-full
+                    [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap"
              data-editable data-model="post" data-id="{{ $post->id }}" data-field="content">
             {!! $post->content !!}
         </div>

@@ -28,20 +28,16 @@
                 <div class="faq-item">
                     <dt>
                         <button class="faq-question w-full flex items-start justify-between gap-4 py-5 text-left">
-                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed"
-                                  data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="question">
-                                {{ $faq->question }}
-                            </span>
+                            <span class="text-gray-800 font-medium text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words"
+                                  data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="question">{{ $faq->question }}</span>
                             <svg class="faq-chevron w-5 h-5 text-primary-700 shrink-0 mt-0.5 transition-transform duration-200"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                     </dt>
-                    <dd class="faq-answer hidden pb-5 text-gray-500 text-sm leading-relaxed"
-                        data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="answer">
-                        {{ $faq->answer }}
-                    </dd>
+                    <dd class="faq-answer hidden pb-5 text-gray-500 text-sm leading-relaxed whitespace-pre-wrap break-words"
+                        data-editable data-model="faq" data-id="{{ $faq->id }}" data-field="answer">{{ $faq->answer }}</dd>
                 </div>
                 @endforeach
             </dl>
