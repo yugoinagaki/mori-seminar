@@ -220,6 +220,7 @@ function initMemberModal() {
     const initialChar = initialWrap?.querySelector('span');
     const bioEl     = document.getElementById('member-modal-bio');
     const bioEmpty  = document.getElementById('member-modal-bio-empty');
+    const scrollArea = modal.querySelector('.member-modal-scroll');
 
     let lastFocused = null;
 
@@ -276,6 +277,10 @@ function initMemberModal() {
         modal.classList.remove('hidden');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
+
+        // Reset scroll to top so a new member always starts from the top,
+        // regardless of how the previous modal was scrolled.
+        if (scrollArea) scrollArea.scrollTop = 0;
 
         requestAnimationFrame(() => {
             overlay.classList.add('opacity-100');
