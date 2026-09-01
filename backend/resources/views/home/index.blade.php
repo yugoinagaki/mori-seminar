@@ -282,13 +282,23 @@
                     {{ $professor->name_en }} &nbsp;|&nbsp;
                     <span data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="title">{{ $professor->title }}</span>
                 </p>
-                @if($professor->bio)
-                <div class="text-gray-500 text-sm leading-[2] mb-5 line-clamp-4"
-                     data-editable data-model="professor" data-id="{{ $professor->id }}" data-field="bio">
-                    {!! $professor->bio !!}
+                @php
+                    $homeBioBlocks = collect($professor->bio_blocks ?? [])
+                        ->filter(fn ($b) => !empty($b['body']));
+                    $homeBio = $homeBioBlocks->isNotEmpty()
+                        ? $homeBioBlocks->pluck('body')->implode(' ')
+                        : $professor->bio;
+                @endphp
+                @if($homeBio)
+                <div class="text-gray-500 text-sm leading-[2] mb-5 line-clamp-4">
+                    {!! $homeBio !!}
                 </div>
                 @endif
-                @if($professor->research_themes)
+                @if($professor->research_themes_body)
+                <div class="text-gray-500 text-sm leading-relaxed mb-10 line-clamp-3 [&_p]:whitespace-pre-wrap [&_li]:whitespace-pre-wrap [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5">
+                    {!! $professor->research_themes_body !!}
+                </div>
+                @elseif($professor->research_themes)
                 <div class="flex flex-wrap gap-2 mb-10">
                     @foreach($professor->research_themes as $tag)
                     <span class="text-xs px-3 py-1.5 bg-primary-50 text-primary-700 font-medium tracking-wide">{{ $tag }}</span>
