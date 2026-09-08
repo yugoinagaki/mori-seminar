@@ -173,7 +173,7 @@
                     <ul class="grid grid-cols-2 gap-x-6 gap-y-3">
                         @php
                             $footerLinks = collect([
-                                ['Annual Theme', '/theme',        'theme'],
+                                ['Theme',        '/theme',        'theme'],
                                 ['News',         '/news',         'news'],
                                 ['Professor',    '/professor',    'professor'],
                                 ['Blog',         '/blog',         'blog'],
