@@ -13,6 +13,33 @@
         </div>
     </div>
 
+    {{-- Cohort tabs (only shown if any cohort has blog posts, or uncategorized exists) --}}
+    @if($cohorts->isNotEmpty() || $hasUncategorized)
+    <div class="bg-white border-b border-gray-100 sticky top-[60px] z-40">
+        <div class="max-w-7xl mx-auto px-6 md:px-14 flex gap-0 overflow-x-auto">
+            <a href="/blog"
+               class="px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
+                      {{ $activeCohort === 'all' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-400 hover:text-gray-700' }}">
+                全員
+            </a>
+            @foreach($cohorts as $c)
+            <a href="/blog?cohort={{ $c->id }}"
+               class="px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
+                      {{ (string)$activeCohort === (string)$c->id ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-400 hover:text-gray-700' }}">
+                {{ $c->generation }}期
+            </a>
+            @endforeach
+            @if($hasUncategorized)
+            <a href="/blog?cohort=uncategorized"
+               class="px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
+                      {{ $activeCohort === 'uncategorized' ? 'border-primary-700 text-primary-700' : 'border-transparent text-gray-400 hover:text-gray-700' }}">
+                未分類
+            </a>
+            @endif
+        </div>
+    </div>
+    @endif
+
     <div class="max-w-7xl mx-auto px-6 md:px-14 py-16">
         @if($posts->isNotEmpty())
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -29,7 +56,14 @@
                     </div>
                     @endif
                 </div>
-                <time class="text-gray-400 text-xs font-mono">{{ $post->published_at?->format('Y.m.d') }}</time>
+                <div class="flex items-center gap-3 text-xs">
+                    <time class="text-gray-400 font-mono">{{ $post->published_at?->format('Y.m.d') }}</time>
+                    @if($post->cohort?->generation)
+                    <span class="text-[10px] px-2 py-0.5 border border-primary-700 text-primary-700 tracking-wider font-medium">
+                        {{ $post->cohort->generation }}期
+                    </span>
+                    @endif
+                </div>
                 <h2 class="text-gray-800 font-bold mt-1 group-hover:text-primary-700 transition-colors leading-snug">
                     {{ $post->title }}
                 </h2>

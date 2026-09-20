@@ -56,7 +56,8 @@ class PostResource extends Resource
                                     'admission'=> '入ゼミ情報',
                                 ])
                                 ->required()
-                                ->default('news'),
+                                ->default('news')
+                                ->live(),
 
                             Forms\Components\Select::make('status')
                                 ->label('ステータス')
@@ -71,6 +72,16 @@ class PostResource extends Resource
                                 ->label('公開日時')
                                 ->nullable(),
                         ]),
+
+                        Forms\Components\Select::make('cohort_id')
+                            ->label('期 (Blog のみ)')
+                            ->relationship('cohort', 'generation')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->generation}期")
+                            ->searchable()
+                            ->preload()
+                            ->nullable()
+                            ->helperText('ブログ記事に紐づける期。ゼミ生と共通の「期」マスタから選択。空欄なら「全員」タブのみに表示。')
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'blog'),
                     ])
                     ->columnSpan(2),
 
@@ -178,6 +189,12 @@ class PostResource extends Resource
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('投稿者')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('cohort.generation')
+                    ->label('期')
+                    ->formatStateUsing(fn ($state) => $state ? "{$state}期" : '-')
+                    ->sortable()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('状態')

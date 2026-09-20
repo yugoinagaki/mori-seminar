@@ -9,7 +9,7 @@ class Post extends Model
 {
     protected $fillable = [
         'wp_id', 'title', 'slug', 'content', 'excerpt', 'type',
-        'author_id', 'thumbnail_url', 'status', 'published_at',
+        'author_id', 'cohort_id', 'thumbnail_url', 'status', 'published_at',
     ];
 
     protected $casts = [
@@ -28,6 +28,11 @@ class Post extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function cohort()
+    {
+        return $this->belongsTo(Cohort::class);
     }
 
     public function categories()

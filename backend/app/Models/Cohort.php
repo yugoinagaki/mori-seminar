@@ -12,4 +12,9 @@ class Cohort extends Model
     {
         return $this->hasMany(Member::class);
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
