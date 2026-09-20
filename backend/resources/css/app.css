@@ -259,6 +259,15 @@
 /* ── Intro splash (once per session) ───────────────────────────────────────── */
 .intro-seen #intro-splash { display: none !important; }
 
+/* ── Hide Trix (RichEditor) auto-appended filename/size on public pages ────── */
+/* Trix ラップの <figure class="attachment"> 内に自動挿入される
+   .attachment__name (ファイル名) と .attachment__size (バイト数) を隠す。
+   ユーザーが自分でつけたキャプション (.attachment__caption-editable) は残す。 */
+.attachment__name,
+.attachment__size {
+    display: none !important;
+}
+
 /* ── Members marquee (home page) ────────────────────────────────────────────── */
 @keyframes members-marquee {
     from { transform: translateX(0); }
