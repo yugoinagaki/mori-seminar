@@ -107,7 +107,7 @@
 
             <div class="flex flex-col md:flex-row flex-1 min-h-0">
                 {{-- Framed photo (amber border at modal edge, no mat) --}}
-                <div class="relative h-[45%] md:h-full md:w-3/5 bg-primary-950 overflow-hidden shrink-0 border-b-2 md:border-b-0 md:border-r-2 border-amber-400">
+                <div class="relative aspect-[4/3] md:aspect-auto md:h-full md:w-3/5 bg-primary-950 overflow-hidden shrink-0 border-b-2 md:border-b-0 md:border-r-2 border-amber-400">
                     <img id="member-modal-image" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
                     <div id="member-modal-initial" class="absolute inset-0 hidden items-center justify-center bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950">
                         <span class="text-white/25 text-[10rem] font-bold font-mincho leading-none"></span>
