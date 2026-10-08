@@ -33,6 +33,10 @@ class CohortResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->helperText('半角数字。同じ期の重複はできません。'),
+
+                Forms\Components\Toggle::make('visible')
+                    ->label('ゼミ生紹介ページに公開')
+                    ->default(true),
             ]);
     }
 
@@ -49,6 +53,9 @@ class CohortResource extends Resource
                 Tables\Columns\TextColumn::make('members_count')
                     ->label('所属人数')
                     ->formatStateUsing(fn ($state) => "{$state}人"),
+
+                Tables\Columns\ToggleColumn::make('visible')
+                    ->label('公開'),
             ])
             ->defaultSort('generation', 'desc')
             ->actions([

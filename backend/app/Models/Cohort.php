@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cohort extends Model
 {
-    protected $fillable = ['generation'];
+    protected $fillable = ['generation', 'visible'];
+
+    protected $casts = ['visible' => 'boolean'];
 
     public function members()
     {
