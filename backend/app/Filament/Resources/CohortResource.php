@@ -56,7 +56,8 @@ class CohortResource extends Resource
                     ->formatStateUsing(fn ($state) => "{$state}人"),
 
                 Tables\Columns\ToggleColumn::make('visible')
-                    ->label('公開'),
+                    ->label('公開')
+                    ->tooltip('ゼミ生紹介ページのみ対象。ブログは期に関わらず常に公開されます。'),
             ])
             ->defaultSort('generation', 'desc')
             ->actions([
