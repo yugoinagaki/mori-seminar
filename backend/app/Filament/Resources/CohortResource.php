@@ -57,7 +57,8 @@ class CohortResource extends Resource
 
                 Tables\Columns\ToggleColumn::make('visible')
                     ->label('公開')
-                    ->tooltip('ゼミ生紹介ページのみ対象。ブログは期に関わらず常に公開されます。'),
+                    ->tooltip('ゼミ生紹介ページのみ対象。ブログは期に関わらず常に公開されます。')
+                    ->grow(false),
             ])
             ->defaultSort('generation', 'desc')
             ->actions([
