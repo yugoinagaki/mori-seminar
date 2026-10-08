@@ -36,6 +36,7 @@ class CohortResource extends Resource
 
                 Forms\Components\Toggle::make('visible')
                     ->label('ゼミ生紹介ページに公開')
+                    ->helperText('オフにするとゼミ生紹介ページのタブと一覧から非表示になります。ブログ記事は期に関わらずずっと公開されます。')
                     ->default(true),
             ]);
     }
