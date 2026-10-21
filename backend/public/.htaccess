@@ -1,5 +1,9 @@
 # ── Temporary site-wide IP restriction (CVE-2026-109618/109619 対応 暫定措置) ──
 # XServerのPHP更新確認後に削除すること
+<Files "maintenance.html">
+    Require all granted
+</Files>
+ErrorDocument 403 /maintenance.html
 Require ip 133.201.33.160
 
 # ── Gzip compression ──────────────────────────────────────────────────────────
