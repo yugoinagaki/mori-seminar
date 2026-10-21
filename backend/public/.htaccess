@@ -30,6 +30,7 @@
     RewriteEngine On
     RewriteCond %{DOCUMENT_ROOT}/maintenance.flag -f
     RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+    RewriteCond %{REQUEST_URI} !^/admin
     RewriteRule ^ /maintenance.html [R=302,L]
 </IfModule>
 
