@@ -33,6 +33,14 @@ Require ip 133.201.33.160
     ExpiresByType text/html    "access plus 1 minute"
 </IfModule>
 
+# ── Maintenance mode (flag file, PHP-free) ───────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{DOCUMENT_ROOT}/maintenance.flag -f
+    RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+    RewriteRule ^ /maintenance.html [R=302,L]
+</IfModule>
+
 # ── Admin IP restriction (temporary: until PHP is updated to 8.3.36+) ─────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
