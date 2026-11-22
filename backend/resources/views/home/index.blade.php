@@ -28,6 +28,25 @@
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-28">
         <div class="text-center">
+            @if($setting->admission_cta_enabled)
+                <div class="flex justify-center mb-6">
+                    <a href="/news?type=admission"
+                       class="inline-flex items-center gap-3 px-5 py-2 rounded-full
+                              border border-white/40 bg-white/5 backdrop-blur-sm
+                              text-white text-xs tracking-[0.35em] uppercase font-light
+                              hover:bg-white/10 hover:border-white/60
+                              transition-all duration-300 group"
+                       data-wipe-link>
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                        入ゼミ情報
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            @endif
+
             <h1 class="text-white font-bold mb-6 leading-none relative"
                 id="hero-title"
                 style="font-size: clamp(1.5rem, 8vw, 6rem); letter-spacing: 0.08em">
