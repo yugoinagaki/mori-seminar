@@ -32,9 +32,11 @@ class SiteSettingsPage extends Page implements HasForms
     public array $transition2 = [];
     public array $transition3 = [];
 
+    public ?array $admissionData = [];
+
     protected function getForms(): array
     {
-        return ['heroForm', 'transitionForm'];
+        return ['heroForm', 'transitionForm', 'admissionForm'];
     }
 
     public function mount(): void
@@ -50,6 +52,10 @@ class SiteSettingsPage extends Page implements HasForms
             'transition1' => isset($existing[0]) ? [$existing[0]] : [],
             'transition2' => isset($existing[1]) ? [$existing[1]] : [],
             'transition3' => isset($existing[2]) ? [$existing[2]] : [],
+        ]);
+
+        $this->admissionForm->fill([
+            'admission_cta_enabled' => (bool) $setting->admission_cta_enabled,
         ]);
     }
 
@@ -76,6 +82,22 @@ class SiteSettingsPage extends Page implements HasForms
                     ]),
             ])
             ->statePath('data');
+    }
+
+    public function admissionForm(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('トップページ: 入ゼミ情報バナー')
+                    ->description('ONにするとトップページの森聡研究会タイトル上に「入ゼミ情報 →」ボタンが表示され、クリックで入ゼミ記事一覧 (/news?type=admission) に遷移します。')
+                    ->schema([
+                        Forms\Components\Toggle::make('admission_cta_enabled')
+                            ->label('トップに「入ゼミ情報」ボタンを表示')
+                            ->inline(false)
+                            ->helperText('入ゼミ期間だけONにする想定です。OFFにするとボタンは完全に非表示になります。'),
+                    ]),
+            ])
+            ->statePath('admissionData');
     }
 
     public function transitionForm(Form $form): Form
@@ -148,10 +170,13 @@ class SiteSettingsPage extends Page implements HasForms
             }
         }
 
-        DB::transaction(function () use ($setting, $hero, $transitions) {
+        $admissionState = $this->admissionForm->getState();
+
+        DB::transaction(function () use ($setting, $hero, $transitions, $admissionState) {
             $setting->update([
                 'hero_image_url'        => $hero,
                 'transition_image_urls' => $transitions ?: null,
+                'admission_cta_enabled' => (bool) ($admissionState['admission_cta_enabled'] ?? false),
             ]);
 
             if ($hero) MediaFile::track($hero, 'hero');

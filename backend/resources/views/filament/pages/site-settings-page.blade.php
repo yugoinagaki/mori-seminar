@@ -2,6 +2,7 @@
     <form wire:submit="save">
         {{ $this->heroForm }}
         {{ $this->transitionForm }}
+        {{ $this->admissionForm }}
         <div class="mt-6">
             <x-filament::button type="submit">
                 保存する

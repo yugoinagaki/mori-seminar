@@ -20,11 +20,13 @@ class SiteSetting extends Model
     protected $fillable = [
         'hero_image_url', 'transition_image_urls', 'page_visibilities',
         'contact_email', 'contact_twitter_url', 'contact_instagram_url',
+        'admission_cta_enabled',
     ];
 
     protected $casts = [
         'transition_image_urls' => 'array',
         'page_visibilities'     => 'array',
+        'admission_cta_enabled' => 'boolean',
     ];
 
     public static function instance(): self
