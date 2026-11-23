@@ -266,6 +266,11 @@
                     <span class="relative z-10 text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 w-fit shrink-0 border border-transparent transition-all duration-300 delay-100 {{ $typeStyle[$item->type] ?? 'bg-gray-200 text-gray-600' }} group-hover:!bg-transparent group-hover:!text-white group-hover:border-white/60">
                         {{ $typeLabel[$item->type] ?? $item->type }}
                     </span>
+                    @if($item->pinned_at)
+                    <span class="relative z-10 text-sm shrink-0" title="ピン留め" aria-label="ピン留め">
+                        📌
+                    </span>
+                    @endif
                     <span class="relative z-10 flex-1 text-gray-700 group-hover:text-white text-sm md:text-[15px] font-medium transition-colors duration-300 delay-100">
                         {{ $item->title }}
                     </span>
