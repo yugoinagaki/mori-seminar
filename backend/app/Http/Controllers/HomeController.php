@@ -20,6 +20,8 @@ class HomeController extends Controller
         $recentPosts = Post::with(['author:id,name', 'tags:id,name,slug'])
             ->where('status', 'published')
             ->whereIn('type', ['news', 'activity', 'admission', 'blog'])
+            ->orderByRaw('CASE WHEN pinned_at IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('pinned_at', 'desc')
             ->orderBy('published_at', 'desc')
             ->limit(6)
             ->get();

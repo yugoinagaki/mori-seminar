@@ -82,6 +82,42 @@ class PostResource extends Resource
                             ->nullable()
                             ->helperText('ブログ記事に紐づける期。ゼミ生と共通の「期」マスタから選択。空欄なら「全員」タブのみに表示。')
                             ->visible(fn (Forms\Get $get) => $get('type') === 'blog'),
+
+                        Forms\Components\Hidden::make('pinned_at'),
+
+                        Forms\Components\Toggle::make('is_pinned')
+                            ->label('📌 ピン留め')
+                            ->helperText('一覧の最上部に固定表示します（最大3件まで）。')
+                            ->dehydrated(false)
+                            ->afterStateHydrated(function (Forms\Components\Toggle $component, $record) {
+                                $component->state($record !== null && $record->pinned_at !== null);
+                            })
+                            ->afterStateUpdated(function (bool $state, Forms\Set $set, Forms\Get $get) {
+                                if ($state) {
+                                    if (! $get('pinned_at')) {
+                                        $set('pinned_at', now());
+                                    }
+                                } else {
+                                    $set('pinned_at', null);
+                                }
+                            })
+                            ->rules([
+                                function (?Post $record) {
+                                    return function (string $attribute, $value, \Closure $fail) use ($record) {
+                                        if (! $value) {
+                                            return;
+                                        }
+                                        $query = Post::whereNotNull('pinned_at');
+                                        if ($record) {
+                                            $query->where('id', '!=', $record->id);
+                                        }
+                                        if ($query->count() >= 3) {
+                                            $fail('ピン留めは最大3件までです。他の記事のピンを外してから設定してください。');
+                                        }
+                                    };
+                                },
+                            ])
+                            ->live(),
                     ])
                     ->columnSpan(2),
 
@@ -161,6 +197,15 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\IconColumn::make('pinned_at')
+                    ->label('📌')
+                    ->boolean()
+                    ->trueIcon('heroicon-s-bookmark')
+                    ->falseIcon('heroicon-o-bookmark')
+                    ->trueColor('warning')
+                    ->falseColor('gray')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('種別')
                     ->badge()

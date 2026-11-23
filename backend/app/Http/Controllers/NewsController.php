@@ -23,6 +23,8 @@ class NewsController extends Controller
 
         $query = Post::with(['author:id,name', 'tags:id,name,slug'])
             ->where('status', 'published')
+            ->orderByRaw('CASE WHEN pinned_at IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('pinned_at', 'desc')
             ->orderBy('published_at', 'desc');
 
         if ($activeType === 'all') {

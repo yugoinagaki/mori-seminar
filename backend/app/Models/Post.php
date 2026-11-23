@@ -9,11 +9,12 @@ class Post extends Model
 {
     protected $fillable = [
         'wp_id', 'title', 'slug', 'content', 'excerpt', 'type',
-        'author_id', 'cohort_id', 'thumbnail_url', 'status', 'published_at',
+        'author_id', 'cohort_id', 'thumbnail_url', 'status', 'published_at', 'pinned_at',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'pinned_at'    => 'datetime',
     ];
 
     protected static function booted(): void
