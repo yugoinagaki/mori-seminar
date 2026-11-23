@@ -140,8 +140,9 @@
     <div class="ticker-track">
         @php
             $tickerItems = $recentPosts->map(fn($p) => [
-                'slug'  => ($p->type === 'blog' ? '/blog/' : '/news/') . $p->slug,
-                'label' => ($p->published_at?->format('Y.m.d') ?? '') . ' ── ' . $p->title,
+                'slug'   => ($p->type === 'blog' ? '/blog/' : '/news/') . $p->slug,
+                'label'  => ($p->published_at?->format('Y.m.d') ?? '') . ' ── ' . $p->title,
+                'pinned' => $p->pinned_at !== null,
             ]);
         @endphp
         @foreach([$tickerItems, $tickerItems] as $pass)
@@ -149,7 +150,11 @@
             <a href="{{ $item['slug'] }}"
                class="text-white/80 hover:text-white text-xs tracking-wide font-light mx-10 whitespace-nowrap transition-colors"
                data-wipe-link>
-                <span class="text-white/30 mr-6">◆</span>{{ $item['label'] }}
+                @if($item['pinned'])
+                    <span class="mr-6" title="ピン留め" aria-label="ピン留め">📌</span>
+                @else
+                    <span class="text-white/30 mr-6">◆</span>
+                @endif{{ $item['label'] }}
             </a>
             @endforeach
         @endforeach
